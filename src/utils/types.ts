@@ -1,7 +1,7 @@
 import { Roles } from "./constants";
 
 export type CreateUserDetails = {
-    email: string;
+    mobileNo: string;
     firstName: string;
     lastName: string;
     password: string;
@@ -9,7 +9,7 @@ export type CreateUserDetails = {
     refrenceCode:string;
   };
 export type CreateOtherUserDetails = {
-    email: string;
+    mobileNo: string;
     firstName: string;
     lastName: string;
     password: string;
@@ -23,7 +23,7 @@ export type CreateOtherUserDetails = {
   };
   export type ValidateUserDetails = {
     password: string;
-    email: string;
+    mobileNo: string;
   };
   export type FilterDTO = Partial<{
     pageNumber: number;
