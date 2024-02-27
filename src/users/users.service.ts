@@ -9,11 +9,11 @@ export class UsersService {
   constructor(
     @InjectModel(user.name) private userRepository: Model<userDetails>,
   ) {}
-  getUserCount(email: string) {
-    return this.userRepository.count({ email: email?.toLowerCase() });
+  getUserCount(mobileNo: string) {
+    return this.userRepository.count({ mobileNo: mobileNo });
   }
-  getUserByEmail(email: string) {
-    return this.userRepository.findOne({ email: email?.toLowerCase() });
+  getUserByMobileNO(mobileNo: string) {
+    return this.userRepository.findOne({ mobileNo: mobileNo });
   }
   getUserCountByRefCode(refCode: string) {
     return this.userRepository.count({ uniqueCode:refCode });

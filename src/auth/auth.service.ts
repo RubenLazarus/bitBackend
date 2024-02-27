@@ -39,7 +39,7 @@ export class AuthService {
   }
   async signUpUser(User: any) {
     try {
-      const validateUser = await this.userService.getUserCount(User?.email);
+      const validateUser = await this.userService.getUserCount(User?.mobileNo);
       if (validateUser > 0) {
         return { message: 'User Already exist', success: false };
       }
@@ -48,13 +48,13 @@ export class AuthService {
         return { message: 'RefrenceCode Does not Exist', success: false };
       }
 
-      User.email = User?.email?.toLowerCase();
+      User.mobileNo = User?.mobileNo?.toLowerCase();
       const passwordHash = bcrypt.hashSync(
         User.password,
         bcrypt.genSaltSync(10),
       );
       let userObject: any = {
-        email: User?.email?.toLowerCase(),
+        mobileNo: User?.mobileNo?.toLowerCase(),
         displayName: User?.displayName
           ? User?.displayName
           : `${User?.firstName} ${User?.lastName}`,
@@ -86,7 +86,7 @@ export class AuthService {
   async login(data:any){
     try {
       const {username,password}=data;
-      let checkUser = await this.userService.getUserByEmail(username);
+      let checkUser = await this.userService.getUserByMobileNO(username);
       if(!checkUser)
       {
         return {
