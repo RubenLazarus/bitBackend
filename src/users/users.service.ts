@@ -12,9 +12,13 @@ export class UsersService {
   getUserCount(email: string) {
     return this.userRepository.count({ email: email?.toLowerCase() });
   }
+  getUserByEmail(email: string) {
+    return this.userRepository.findOne({ email: email?.toLowerCase() });
+  }
   getUserCountByRefCode(refCode: string) {
     return this.userRepository.count({ uniqueCode:refCode });
   }
+
   async createUser(userDetails) {
     try {
       let user: any = {

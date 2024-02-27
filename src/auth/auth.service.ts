@@ -83,4 +83,56 @@ export class AuthService {
       );
     }
   }
+  async login(data:any){
+    try {
+      const {username,password}=data;
+      let checkUser = await this.userService.getUserByEmail(username);
+      if(!checkUser)
+      {
+        return {
+          success:false,
+          message:"Incorrect username or password"
+        }
+      }
+      
+      if (
+        !checkUser ||
+        checkUser?.isDeleted == true
+      
+      ) {
+        // this.logger.warn(`${data.username} is try to logIn`)
+        return { success: false, message: 'Incorrect username or password' };
+      }
+      if( checkUser?.isActive == false ){
+        return { success: false, message: 'Your credentials has been deactivated by the superadmin' };
+      }
+      const mathPassword = bcrypt.compareSync(
+        password,
+        checkUser?.passwordHash,
+      );
+      if(  mathPassword === false){
+        return { success: false, message: 'Incorrect username or password' };
+      }
+      // let creatFCM:any
+      // if(data?.notification_token){
+      //   creatFCM = await this.notificationService.createNotificationToken({userId:checkUser._id,notification_token:data?.notification_token})
+      // }
+      const loginDetails = await this.createAccessToken(checkUser);
+      // const obj={
+      //   user:loginDetails?.data?._id,
+      //   title:"user Locked in",
+      //   body:"User has been locked in pleace check"
+      // }
+      // await this.notificationService.sendPush(obj)
+      return Object.assign(loginDetails, {
+        success: true,
+        isUserExists: true,
+        message: 'User exists',
+      });
+
+
+    } catch (error) {
+      console.log(error)
+    }
+  }
 }
