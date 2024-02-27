@@ -12,35 +12,45 @@ export class UsersService {
   getUserCount(email: string) {
     return this.userRepository.count({ email: email?.toLowerCase() });
   }
-  async createUser(userDetails) {
-    let user: any = {};
-    user.firstName = userDetails.firstName;
-    user.lastName = userDetails.lastName;
-    user.email = userDetails.email?.toLowerCase();
-    user.displayName = userDetails.displayName;
-    user.passwordHash = userDetails.passwordHash;
-    user.createdAt = new Date();
-    user.role = Roles.USER;
-    user.refrenceCode = userDetails?.refrenceCode;
-    user.uniqueCode = `${userDetails?.firstName[0]}.${
-      userDetails.lastName
-    }${await this.generateUniqueReferenceCode(5)}`;
-    const addNewUser = await this.userRepository.create({ ...user });
-    return addNewUser;
+  getUserCountByRefCode(refCode: string) {
+    return this.userRepository.count({ uniqueCode:refCode });
   }
+  async createUser(userDetails) {
+    try {
+      let user: any = {
+        firstName:userDetails?.firstName,
+        lastName:userDetails?.lastName,
+        email:userDetails?.email?.toLowerCase(),
+        displayName:userDetails?.displayName,
+        passwordHash:userDetails?.passwordHash,
+        createdAt:new Date(),
+        role:Roles.USER,
+        refrenceCode:userDetails?.refrenceCode,
+       
+      };
+      user.uniqueCode=(`${userDetails?.firstName[0]}${userDetails.lastName}${await this.generateUniqueReferenceCode(5,userDetails)}`).toString()
+      let addNewUser = await this.userRepository.create(user);
+      return addNewUser;
+    } catch (error) {
+      console.log(error)
+
+    }
+
+  }
+  
   async createOtherUser(userDetails) {
     let user: any = {};
     user.firstName = userDetails.firstName;
     user.lastName = userDetails.lastName;
     user.email = userDetails.email?.toLowerCase();
-    user.displayName = userDetails.displayName;
+    user.displayName = `${userDetails.firstName} ${userDetails.lastName}`;
     user.passwordHash = userDetails.passwordHash;
     user.createdAt = new Date();
     user.role = userDetails?.role;
     user.refrenceCode = userDetails?.refrenceCode;
     user.uniqueCode = `${userDetails?.firstName[0]}.${
       userDetails.lastName
-    }${await this.generateUniqueReferenceCode(5)}`;
+    }${await this.generateUniqueReferenceCode(5,userDetails)}`;
     const addNewUser = await this.userRepository.create({ ...user });
     return addNewUser;
   }
@@ -90,15 +100,15 @@ export class UsersService {
     }
     return code;
   }
-  async generateUniqueReferenceCode(length) {
-    let code = this.generateReferenceCode(length);
-    while (!this.isReferenceCodeUnique(code)) {
-      code = this.generateReferenceCode(length);
+  async generateUniqueReferenceCode(length,userDetails) {
+    let code = await this.generateReferenceCode(length);
+    while (! await this.isReferenceCodeUnique(code,userDetails)) {
+      code = await this.generateReferenceCode(length);
     }
-    return code;
+    return code.toString();
   }
-  async isReferenceCodeUnique(code) {
-    let count = await this.userRepository.count({ uniqueCode: code });
+  async isReferenceCodeUnique(code,userDetails) {
+    let count = await this.userRepository.count({ uniqueCode: `${userDetails?.firstName[0]}${userDetails.lastName}${code}` });
     if (count > 0) {
       return false;
     }

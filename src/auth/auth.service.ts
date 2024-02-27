@@ -43,6 +43,10 @@ export class AuthService {
       if (validateUser > 0) {
         return { message: 'User Already exist', success: false };
       }
+      const validRefCode:any = await this.userService.getUserCountByRefCode(User?.refrenceCode)
+      if(validRefCode==0){
+        return { message: 'RefrenceCode Does not Exist', success: false };
+      }
 
       User.email = User?.email?.toLowerCase();
       const passwordHash = bcrypt.hashSync(
@@ -57,6 +61,7 @@ export class AuthService {
         firstName: User?.firstName,
         lastName: User?.lastName,
         passwordHash,
+        refrenceCode:User?.refrenceCode,
         creatdAt: new Date(),
       };
       const addNewuser = await this.userService.createUser(userObject);

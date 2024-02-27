@@ -5,7 +5,7 @@ import { IUserService } from './users';
 import { FilterDTO } from 'src/utils/types';
 
 @Controller(Routes.USERS)
-@UseGuards(JwtAuthGuard)
+// @UseGuards(JwtAuthGuard)
 export class UsersController {
   constructor(
     @Inject(Services.USERS)
@@ -15,5 +15,9 @@ export class UsersController {
   @Post('getAllUsers')
   async getAllUsers( @Body() body: FilterDTO) {
     return await this.UserService.getAllUser(body);
+  }
+  @Post('createOtherUser')
+  async createOtherUser( @Body() body) {
+    return await this.UserService.createOtherUser(body);
   }
 }

@@ -5,7 +5,6 @@ export type CreateUserDetails = {
     firstName: string;
     lastName: string;
     password: string;
-    displayName: string;
     passwordHash: string;
     refrenceCode:string;
   };
@@ -14,7 +13,6 @@ export type CreateOtherUserDetails = {
     firstName: string;
     lastName: string;
     password: string;
-    displayName: string;
     passwordHash: string;
     refrenceCode:string;
     role:Roles
