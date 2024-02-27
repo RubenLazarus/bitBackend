@@ -14,9 +14,9 @@ export class AuthService {
     const expiresIn = process.env.JWT_ACCESS_TOKEN_EXPIRE;
 
     const payload = {
-      email: data.email,
-      _id: data._id,
-      mobileNo: data.mobileNo,
+      email: data?.email,
+      _id: data?._id,
+      mobileNo: data?.mobileNo,
       firstName: data?.firstName,
       lastName: data?.lastName,
       displayName: data?.displayName

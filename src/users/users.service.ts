@@ -24,7 +24,7 @@ export class UsersService {
       let user: any = {
         firstName:userDetails?.firstName,
         lastName:userDetails?.lastName,
-        email:userDetails?.email?.toLowerCase(),
+        mobileNo:userDetails?.mobileNo?.toLowerCase(),
         displayName:userDetails?.displayName,
         passwordHash:userDetails?.passwordHash,
         createdAt:new Date(),
@@ -46,7 +46,7 @@ export class UsersService {
     let user: any = {};
     user.firstName = userDetails.firstName;
     user.lastName = userDetails.lastName;
-    user.email = userDetails.email?.toLowerCase();
+    user.mobileNo = userDetails.mobileNo?.toLowerCase();
     user.displayName = `${userDetails.firstName} ${userDetails.lastName}`;
     user.passwordHash = userDetails.passwordHash;
     user.createdAt = new Date();
