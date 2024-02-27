@@ -3,9 +3,15 @@ import { IUserService } from 'src/users/users';
 import { Services } from 'src/utils/constants';
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
+import { IOTPService } from 'src/otp/otp';
+import { smsService } from 'src/comman/sms.service';
 @Injectable()
 export class AuthService {
-  constructor(@Inject(Services.USERS) private userService: IUserService) {}
+  constructor(
+    @Inject(Services.USERS) private userService: IUserService,
+    @Inject(Services.OTP) private otpService: IOTPService,
+    private smsService: smsService
+  ) { }
   async validateUser(user: any): Promise<any> {
     return user;
   }
@@ -43,8 +49,8 @@ export class AuthService {
       if (validateUser > 0) {
         return { message: 'User Already exist', success: false };
       }
-      const validRefCode:any = await this.userService.getUserCountByRefCode(User?.refrenceCode)
-      if(validRefCode==0){
+      const validRefCode: any = await this.userService.getUserCountByRefCode(User?.refrenceCode)
+      if (validRefCode == 0) {
         return { message: 'RefrenceCode Does not Exist', success: false };
       }
 
@@ -61,15 +67,33 @@ export class AuthService {
         firstName: User?.firstName,
         lastName: User?.lastName,
         passwordHash,
-        refrenceCode:User?.refrenceCode,
+        refrenceCode: User?.refrenceCode,
         creatdAt: new Date(),
       };
+
+      const newOTP = await this.otpService.generateOTP()
       const addNewuser = await this.userService.createUser(userObject);
+      let OTPBody = {
+        OTP: newOTP,
+        mobileNo: User.mobileNo
+      }
+
+
+      const isSMSSend = await this.smsService.sentSMS(addNewuser, newOTP)
+      if (isSMSSend) {
+        await this.otpService.createOTP(OTPBody)
+      }
+
       if (addNewuser) {
         const loginDetails = await this.createAccessToken(addNewuser);
+
+        // OTP
+
+
+
         return Object.assign(loginDetails, {
           success: true,
-          message: 'New user has been created',
+          message: 'OTP send To Your Mobile number',
         });
       }
       return {
@@ -83,34 +107,33 @@ export class AuthService {
       );
     }
   }
-  async login(data:any){
+  async login(data: any) {
     try {
-      const {username,password}=data;
+      const { username, password } = data;
       let checkUser = await this.userService.getUserByMobileNO(username);
-      if(!checkUser)
-      {
+      if (!checkUser) {
         return {
-          success:false,
-          message:"Incorrect username or password"
+          success: false,
+          message: "Incorrect username or password"
         }
       }
-      
+
       if (
         !checkUser ||
         checkUser?.isDeleted == true
-      
+
       ) {
         // this.logger.warn(`${data.username} is try to logIn`)
         return { success: false, message: 'Incorrect username or password' };
       }
-      if( checkUser?.isActive == false ){
+      if (checkUser?.isActive == false) {
         return { success: false, message: 'Your credentials has been deactivated by the superadmin' };
       }
       const mathPassword = bcrypt.compareSync(
         password,
         checkUser?.passwordHash,
       );
-      if(  mathPassword === false){
+      if (mathPassword === false) {
         return { success: false, message: 'Incorrect username or password' };
       }
       // let creatFCM:any
@@ -135,4 +158,23 @@ export class AuthService {
       console.log(error)
     }
   }
+  async VerifyOTP(data: any){
+
+     const optData = await this.otpService.otpVerfications(data)
+     if(optData?.success){
+      const userInfo = await this.userService.verifyUser(data?.mobileNo)
+      if(userInfo){
+        const loginDetails = await this.createAccessToken(userInfo);
+        return Object.assign(loginDetails, {
+          success: true,
+          message: 'User has been verified',
+        });
+      }
+     }
+     return {
+      success: false,
+      massage: 'unable to verify otp',
+    };
+  }
+  
 }

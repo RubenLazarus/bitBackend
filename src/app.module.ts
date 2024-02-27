@@ -5,6 +5,7 @@ import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { MongooseModule } from '@nestjs/mongoose';
+import { OtpModule } from './otp/otp.module';
 @Module({
   imports: [ConfigModule.forRoot({
     envFilePath: '.env',
@@ -17,7 +18,8 @@ import { MongooseModule } from '@nestjs/mongoose';
     },
   }),
   UsersModule,
-  AuthModule
+  AuthModule,
+  OtpModule
 ],
   controllers: [AppController],
   providers: [AppService],

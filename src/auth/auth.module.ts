@@ -7,12 +7,17 @@ import { UsersModule } from 'src/users/users.module';
 import { UsersService } from 'src/users/users.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { entities } from 'src/utils/entities';
+import { OtpModule } from 'src/otp/otp.module';
+import { CommanModule } from 'src/comman/comman.module';
+import { smsService } from 'src/comman/sms.service';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
-  imports: [UsersModule, MongooseModule.forFeature(entities)],
+  imports: [OtpModule,UsersModule,CommanModule, MongooseModule.forFeature(entities),HttpModule],
   controllers: [AuthController],
   providers: [
     JwtStrategy,
+    smsService,
     {
       provide: Services.AUTH,
       useClass: AuthService,

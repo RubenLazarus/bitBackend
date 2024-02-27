@@ -25,6 +25,10 @@ export type CreateOtherUserDetails = {
     password: string;
     mobileNo: string;
   };
+  export type verifyOtp = {
+    mobileNo: string;
+    otp: string;
+  };
   export type FilterDTO = Partial<{
     pageNumber: number;
     pageSize: number;

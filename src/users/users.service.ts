@@ -8,7 +8,7 @@ import { Roles } from 'src/utils/constants';
 export class UsersService {
   constructor(
     @InjectModel(user.name) private userRepository: Model<userDetails>,
-  ) {}
+  ) { }
   getUserCount(mobileNo: string) {
     return this.userRepository.count({ mobileNo: mobileNo });
   }
@@ -16,47 +16,57 @@ export class UsersService {
     return this.userRepository.findOne({ mobileNo: mobileNo });
   }
   getUserCountByRefCode(refCode: string) {
-    return this.userRepository.count({ uniqueCode:refCode });
+    return this.userRepository.count({ uniqueCode: refCode });
   }
 
   async createUser(userDetails) {
     try {
       let user: any = {
-        firstName:userDetails?.firstName,
-        lastName:userDetails?.lastName,
-        mobileNo:userDetails?.mobileNo?.toLowerCase(),
-        displayName:userDetails?.displayName,
-        passwordHash:userDetails?.passwordHash,
-        createdAt:new Date(),
-        role:Roles.USER,
-        refrenceCode:userDetails?.refrenceCode,
-       
+        firstName: userDetails?.firstName,
+        lastName: userDetails?.lastName,
+        mobileNo: userDetails?.mobileNo?.toLowerCase(),
+        displayName: userDetails?.displayName,
+        passwordHash: userDetails?.passwordHash,
+        createdAt: new Date(),
+        role: Roles.USER,
+        refrenceCode: userDetails?.refrenceCode,
+
       };
-      user.uniqueCode=(`${userDetails?.firstName[0]}${userDetails.lastName}${await this.generateUniqueReferenceCode(5,userDetails)}`).toString()
+      user.uniqueCode = (`${userDetails?.firstName[0]}${userDetails.lastName}${await this.generateUniqueReferenceCode(5, userDetails)}`).toString()
       let addNewUser = await this.userRepository.create(user);
       return addNewUser;
-    } catch (error) {
-      console.log(error)
+    } catch (e) {
+      throw new HttpException(
+        { success: false, message: e?.message },
+        HttpStatus.BAD_REQUEST,
+      );
 
     }
 
   }
-  
+
   async createOtherUser(userDetails) {
-    let user: any = {};
-    user.firstName = userDetails.firstName;
-    user.lastName = userDetails.lastName;
-    user.mobileNo = userDetails.mobileNo?.toLowerCase();
-    user.displayName = `${userDetails.firstName} ${userDetails.lastName}`;
-    user.passwordHash = userDetails.passwordHash;
-    user.createdAt = new Date();
-    user.role = userDetails?.role;
-    user.refrenceCode = userDetails?.refrenceCode;
-    user.uniqueCode = `${userDetails?.firstName[0]}.${
-      userDetails.lastName
-    }${await this.generateUniqueReferenceCode(5,userDetails)}`;
-    const addNewUser = await this.userRepository.create({ ...user });
-    return addNewUser;
+    try {
+      let user: any = {};
+      user.firstName = userDetails.firstName;
+      user.lastName = userDetails.lastName;
+      user.mobileNo = userDetails.mobileNo?.toLowerCase();
+      user.displayName = `${userDetails.firstName} ${userDetails.lastName}`;
+      user.passwordHash = userDetails.passwordHash;
+      user.createdAt = new Date();
+      user.role = userDetails?.role;
+      user.refrenceCode = userDetails?.refrenceCode;
+      user.uniqueCode = `${userDetails?.firstName[0]}.${userDetails.lastName
+        }${await this.generateUniqueReferenceCode(5, userDetails)}`;
+      const addNewUser = await this.userRepository.create({ ...user });
+      return addNewUser;
+    } catch (e) {
+      throw new HttpException(
+        { success: false, message: e?.message },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
   }
 
   getAllUser(filters) {
@@ -78,7 +88,7 @@ export class UsersService {
         if (filters?.pageSize) {
           pageSize = filters.pageSize;
         }
-  
+
         var searchFilters = [];
         searchFilters.push(
           { isDeleted: false },
@@ -104,18 +114,22 @@ export class UsersService {
     }
     return code;
   }
-  async generateUniqueReferenceCode(length,userDetails) {
+  async generateUniqueReferenceCode(length, userDetails) {
     let code = await this.generateReferenceCode(length);
-    while (! await this.isReferenceCodeUnique(code,userDetails)) {
+    while (! await this.isReferenceCodeUnique(code, userDetails)) {
       code = await this.generateReferenceCode(length);
     }
     return code.toString();
   }
-  async isReferenceCodeUnique(code,userDetails) {
+  async isReferenceCodeUnique(code, userDetails) {
     let count = await this.userRepository.count({ uniqueCode: `${userDetails?.firstName[0]}${userDetails.lastName}${code}` });
     if (count > 0) {
       return false;
     }
     return true;
+  }
+
+  async verifyUser(mobileNo) {
+    return await this.userRepository.findOneAndUpdate({ mobileNo: mobileNo.toString() }, { $set: { isVerified: true } }, { new: true })
   }
 }

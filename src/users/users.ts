@@ -7,4 +7,5 @@ createOtherUser(userDetails:CreateOtherUserDetails)
 getUserCount(email:string)
 getAllUser(userData:FilterDTO)
 getUserByMobileNO(email)
+verifyUser(mobileNo)
 }
