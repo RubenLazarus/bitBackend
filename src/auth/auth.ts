@@ -4,4 +4,5 @@ export interface IAuthService {
   validateUser(userDetails: ValidateUserDetails);
   signUpUser(User: any);
   login(data:any);
+  VerifyOTP(data);
 }

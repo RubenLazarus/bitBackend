@@ -10,6 +10,6 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
   app.useGlobalPipes(new ValidationPipe())
   app.use(passport.initialize())
-  await app.listen(process.env.PORT_LOCAL);
+  await app.listen(parseInt(process.env.PORT_LOCAL));
 }
 bootstrap();

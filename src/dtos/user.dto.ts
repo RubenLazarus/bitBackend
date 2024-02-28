@@ -15,8 +15,7 @@ export class CreateUserDto {
   lastName: string;
 
   @IsNotEmpty()
-  @IsEmail()
-  email: string;
+  mobileNo: string;
   @IsNotEmpty()
   @IsString()
   refrenceCode: string;

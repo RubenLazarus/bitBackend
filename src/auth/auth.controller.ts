@@ -17,4 +17,9 @@ export class AuthController {
     return await this.authService.login(loggedInUser)
 
   }
+  @Post('VerifyOTP')
+  async VerifyOTP(@Body() loggedInUser:loginUserDetails){
+    return await this.authService.VerifyOTP(loggedInUser)
+
+  }
 }

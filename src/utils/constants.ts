@@ -5,6 +5,7 @@ export enum Routes {
 export enum Services {
     USERS = 'USERS_SERVICE', 
     AUTH = 'AUTH_SERVICE',
+    OTP = 'OTP_SERVICE',
 }
 export enum Prioriyt {
     LOW = 'Low',
