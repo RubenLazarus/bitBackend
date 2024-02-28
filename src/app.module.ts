@@ -6,6 +6,7 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { OtpModule } from './otp/otp.module';
+import { GatewayModule } from './gateway/gateway.module';
 @Module({
   imports: [ConfigModule.forRoot({
     envFilePath: '.env',
@@ -19,7 +20,8 @@ import { OtpModule } from './otp/otp.module';
   }),
   UsersModule,
   AuthModule,
-  OtpModule
+  OtpModule,
+  GatewayModule
 ],
   controllers: [AppController],
   providers: [AppService],

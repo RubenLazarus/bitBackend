@@ -6,6 +6,7 @@ export enum Services {
     USERS = 'USERS_SERVICE', 
     AUTH = 'AUTH_SERVICE',
     OTP = 'OTP_SERVICE',
+    GATEWAY_SESSION_MANAGER='GATEWAY_SESSION_MANAGER'
 }
 export enum Prioriyt {
     LOW = 'Low',
