@@ -1,4 +1,4 @@
-import { Body, Controller, Inject, Post } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Post } from '@nestjs/common';
 import { Routes, Services } from 'src/utils/constants';
 import { IGameService } from './game';
 
@@ -11,6 +11,10 @@ export class GameController {
       @Post('createGame')
       async createOtherUser( @Body() body) {
         return await this.gameService.createGame(body);
+      }
+      @Get('getAllGames')
+      async getAllGames (){
+        return await this.gameService.getAllGame()
       }
 
 

@@ -29,4 +29,12 @@ export class GameService {
         data:createdData
      }
     }
+    async getAllGame(){
+        let allGames = await this.gameRepository.find({isActive:true,isDeleted:false})
+        return {
+            success :true,
+            message:"Gell all messages",
+            gameList:allGames
+        }
+    }
 }
