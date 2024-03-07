@@ -37,3 +37,17 @@ export type CreateOtherUserDetails = {
     dateTo: Date;
     userid: string;
   }>;
+  export type createGame={
+    name:string;
+    imageUrl:string;
+  }
+  export type updateGame=Partial<{
+    name:string;
+    imageUrl:string;
+  }>
+  export type softDeleteGame = {
+    _id:string;
+  }
+  export type hardDeleteGame = {
+    _id:string;
+  }

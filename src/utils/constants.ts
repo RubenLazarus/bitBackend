@@ -1,11 +1,13 @@
 export enum Routes {
     AUTH = 'auth',
     USERS = 'users', 
+    GAME = 'game', 
 }
 export enum Services {
     USERS = 'USERS_SERVICE', 
     AUTH = 'AUTH_SERVICE',
     OTP = 'OTP_SERVICE',
+    GAME = 'GAME_SERVICE',
     GATEWAY_SESSION_MANAGER='GATEWAY_SESSION_MANAGER'
 }
 export enum Prioriyt {
