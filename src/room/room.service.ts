@@ -58,4 +58,26 @@ export class RoomService {
         data:updataedStatus
        }
     }
+    async getAllRooms(data){
+        let object:any ={}
+        if(data?.gameId){
+            object.gameId= data?.gameId
+        }
+        let allRooms = await this.roomRepository.aggregate([{
+            $match:object
+        },{
+            $lookup: {
+                from: 'game',
+                localField: 'gameId',
+                foreignField: '_id',
+                as: 'gameData',
+              },
+        }
+    ])
+    return{
+        success:true,
+        message:"All Room",
+        data:allRooms
+    }
+    }
 }

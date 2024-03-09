@@ -17,4 +17,8 @@ export class RoomController {
       async changeStaus(@Body() data:any){
         return await this.RoomService.changeStatus(data)
       }
+      @Post('getAllRooms')
+      async getAllRooms(@Body() data:any){
+        return await this.RoomService.getAllRooms(data)
+      }
 }
