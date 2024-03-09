@@ -11,7 +11,7 @@ export type roomDetails = room & Document;
 
 @Schema()
 export class room extends CommanDTO {
-  @Prop({ type: String, ref: 'game'})
+  @Prop({ type: String, ref: 'games'})
   @IsNotEmpty()
   gameId: game
 

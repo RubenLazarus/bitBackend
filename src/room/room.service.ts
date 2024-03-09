@@ -67,7 +67,7 @@ export class RoomService {
             $match:object
         },{
             $lookup: {
-                from: 'game',
+                from: 'games',
                 localField: 'gameId',
                 foreignField: '_id',
                 as: 'gameData',

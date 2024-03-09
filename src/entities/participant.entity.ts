@@ -12,10 +12,10 @@ export type participantDetails = participant & Document;
 
 @Schema()
 export class participant extends CommanDTO {
-  @Prop({ type: String, ref: 'room'})
+  @Prop({ type: String, ref: 'rooms'})
   @IsNotEmpty()
   roomId: room
-  @Prop({ type: String, ref: 'user'})
+  @Prop({ type: String, ref: 'users'})
   @IsNotEmpty()
   userId: user
   @Prop({type:String,enum:COLOR})

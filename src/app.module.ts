@@ -9,6 +9,7 @@ import { OtpModule } from './otp/otp.module';
 import { GatewayModule } from './gateway/gateway.module';
 import { GameModule } from './game/game.module';
 import { RoomModule } from './room/room.module';
+import { ParticipantModule } from './participant/participant.module';
 @Module({
   imports: [ConfigModule.forRoot({
     envFilePath: '.env',
@@ -25,7 +26,8 @@ import { RoomModule } from './room/room.module';
   OtpModule,
   GatewayModule,
   GameModule,
-  RoomModule
+  RoomModule,
+  ParticipantModule
 ],
   controllers: [AppController],
   providers: [AppService],
