@@ -5,25 +5,27 @@ import { CommanDTO } from 'src/dtos/comman.dto';
 import { room } from './room.entity';
 import { user } from './user.entity';
 import { COLOR } from 'src/utils/constants';
-import { participantOrder } from './participantOrder.entity';
 
 
 
-export type participantDetails = participant & Document;
+export type participantOrderDetails = participantOrder & Document;
 
 @Schema()
-export class participant extends CommanDTO {
+export class participantOrder extends CommanDTO {
   @Prop({ type: String, ref: 'rooms'})
   @IsNotEmpty()
   roomId: room
   @Prop({ type: String, ref: 'users'})
   @IsNotEmpty()
   userId: user
-  @Prop({ type: [{ type: String, ref: 'participantOrders' }] })
-  participantOrderId: participantOrder[];
+  @Prop({type:String,enum:COLOR})
+  @IsNotEmpty()
+  color:COLOR
+  @Prop()
+  bitAmmount:number
 
 
 
 }
 
-export const participantSchemaFile = SchemaFactory.createForClass(participant);
+export const participantOrderSchemaFile = SchemaFactory.createForClass(participantOrder);

@@ -11,6 +11,10 @@ import { Services } from 'src/utils/constants';
   providers: [{
     provide:Services.GAME,
     useClass:GameService
+  }],
+  exports:[{
+    provide:Services.GAME,
+    useClass:GameService
   }]
 })
 export class GameModule {}

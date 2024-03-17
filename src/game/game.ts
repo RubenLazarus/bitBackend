@@ -6,4 +6,5 @@ export interface IGameService {
     updateGame(data:updateGame);
     softDeleteGame(data:softDeleteGame);
     hardDeleteGame(data:hardDeleteGame);
+    getGameByName(name:string)
 }

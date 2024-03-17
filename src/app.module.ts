@@ -10,6 +10,7 @@ import { GatewayModule } from './gateway/gateway.module';
 import { GameModule } from './game/game.module';
 import { RoomModule } from './room/room.module';
 import { ParticipantModule } from './participant/participant.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 @Module({
   imports: [ConfigModule.forRoot({
     envFilePath: '.env',
@@ -21,6 +22,7 @@ import { ParticipantModule } from './participant/participant.module';
       return connection;
     },
   }),
+  EventEmitterModule.forRoot(),
   UsersModule,
   AuthModule,
   OtpModule,

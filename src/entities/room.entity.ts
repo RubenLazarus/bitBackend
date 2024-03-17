@@ -22,6 +22,10 @@ export class room extends CommanDTO {
   startTime:Date
   @Prop()
   endTime:Date
+  @Prop()
+  totalAmount:number
+  @Prop()
+  winColor:Array<string>
 }
 
 export const roomSchemaFile = SchemaFactory.createForClass(room);

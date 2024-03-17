@@ -13,6 +13,10 @@ import { Services } from 'src/utils/constants';
   providers: [{
     provide:Services.PARTICIPANT,
     useClass:ParticipantService
+  }],
+  exports: [{
+    provide:Services.PARTICIPANT,
+    useClass:ParticipantService
   }]
 })
 export class ParticipantModule {}

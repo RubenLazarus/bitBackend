@@ -7,9 +7,10 @@ import { GatewaySessionManager } from './gateway.session';
 import { UsersModule } from 'src/users/users.module';
 import { entities } from 'src/utils/entities';
 import { Gateway } from './gateway';
+import { ParticipantModule } from 'src/participant/participant.module';
 
 @Module({
-  imports: [MongooseModule.forFeature(entities),UsersModule],
+  imports: [MongooseModule.forFeature(entities),UsersModule,ParticipantModule],
   providers:[Gateway,JwtService, {
       provide: Services.GATEWAY_SESSION_MANAGER,
       useClass: GatewaySessionManager,

@@ -5,10 +5,12 @@ import { RoomService } from './room.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { entities } from 'src/utils/entities';
 import { Services } from 'src/utils/constants';
+import { GameModule } from 'src/game/game.module';
 @Module({
   imports: [
     ScheduleModule.forRoot(),
-    MongooseModule.forFeature(entities)
+    MongooseModule.forFeature(entities),
+    GameModule
   ],
   controllers: [RoomController],
   providers: [{

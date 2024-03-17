@@ -37,4 +37,18 @@ export class GameService {
             gameList:allGames
         }
     }
+    async getGameByName(name){
+        let game = await this.gameRepository.findOne({"name":name})
+        if(!game){
+            return {
+                success:false,
+                message:"Game Not Found"
+            }
+        }
+        return {
+            success:true,
+            message:"Game  Found",
+            data:game
+        }
+    }
 }

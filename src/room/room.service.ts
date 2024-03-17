@@ -1,23 +1,34 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
+import { Cron } from '@nestjs/schedule';
 import { Model } from 'mongoose';
 import { room, roomDetails } from 'src/entities/room.entity';
-import { roomStatus } from 'src/utils/constants';
+import { IGameService } from 'src/game/game';
+import { Services, roomStatus } from 'src/utils/constants';
 
 @Injectable()
 export class RoomService {
     constructor(
         @InjectModel(room.name) private roomRepository: Model<roomDetails>,
-    ) { }
+        private readonly events: EventEmitter2,
+        @Inject(Services.GAME)
+        private readonly gameService: IGameService,
+        ) { }
     async createRoom(data) {
         let object = {
             gameId: data.gameId,
-            status: roomStatus?.UPCOMING,
-            createdAt: new Date()
+            status: roomStatus?.CONTINUE,
+            createdAt: new Date(),
+            startTime : new Date()
         }
 
         let createdRoom = await this.roomRepository.create(object)
-
+        this.events.emit('color.newroom',{
+            success: true,
+            message: "New Room is created",
+            data: createdRoom
+        })
         return {
             success: true,
             message: "New Room is created",
@@ -79,5 +90,16 @@ export class RoomService {
         message:"All Room",
         data:allRooms
     }
+    }
+
+    @Cron('*/30 */2 * * * *')
+   async createNewRooms(){
+        let game:any = await this.gameService.getGameByName('Color Game')
+        if(game?.success){
+            let object={
+                gameId:  game?.data?._id
+            }
+            await this.createRoom(object)
+        }
     }
 }
