@@ -26,6 +26,10 @@ export class room extends CommanDTO {
   totalAmount:number
   @Prop()
   winColor:Array<string>
+  @Prop()
+  winNumber:number
+  @Prop({type:Boolean,default:true})
+  isContinue:boolean
 }
 
 export const roomSchemaFile = SchemaFactory.createForClass(room);

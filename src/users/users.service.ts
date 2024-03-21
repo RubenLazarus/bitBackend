@@ -1,13 +1,15 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { user, userDetails } from 'src/entities/user.entity';
-import { Roles } from 'src/utils/constants';
-
+import { Roles, Services } from 'src/utils/constants';
+import * as bcrypt from 'bcrypt';
+import { IWelletService } from 'src/wallet/wallet';
 @Injectable()
 export class UsersService {
   constructor(
     @InjectModel(user.name) private userRepository: Model<userDetails>,
+    @Inject(Services.WALLET) private walletService: IWelletService,
   ) { }
   getUserCount(mobileNo: string) {
     return this.userRepository.count({ mobileNo: mobileNo });
@@ -47,19 +49,27 @@ export class UsersService {
 
   async createOtherUser(userDetails) {
     try {
+      const passwordHash = bcrypt.hashSync(
+        userDetails.password,
+        bcrypt.genSaltSync(10),
+      );
       let user: any = {};
       user.firstName = userDetails.firstName;
       user.lastName = userDetails.lastName;
       user.mobileNo = userDetails.mobileNo?.toLowerCase();
       user.displayName = `${userDetails.firstName} ${userDetails.lastName}`;
-      user.passwordHash = userDetails.passwordHash;
+      user.passwordHash = passwordHash;
       user.createdAt = new Date();
       user.role = userDetails?.role;
       user.refrenceCode = userDetails?.refrenceCode;
-      user.uniqueCode = `${userDetails?.firstName[0]}.${userDetails.lastName
-        }${await this.generateUniqueReferenceCode(5, userDetails)}`;
-      const addNewUser = await this.userRepository.create({ ...user });
-      return addNewUser;
+      user.uniqueCode = (`${userDetails?.firstName[0]}${userDetails.lastName}${await this.generateUniqueReferenceCode(5, userDetails)}`).toString()
+      let addNewUser = await this.userRepository.create(user);
+      const addWallet = await this.walletService.createWellet(addNewUser?._id)
+      return {
+        success:true,
+        message:"User has been created",
+        data:addNewUser
+      };
     } catch (e) {
       throw new HttpException(
         { success: false, message: e?.message },

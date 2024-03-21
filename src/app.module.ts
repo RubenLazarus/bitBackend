@@ -11,6 +11,7 @@ import { GameModule } from './game/game.module';
 import { RoomModule } from './room/room.module';
 import { ParticipantModule } from './participant/participant.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { WalletModule } from './wallet/wallet.module';
 @Module({
   imports: [ConfigModule.forRoot({
     envFilePath: '.env',
@@ -29,7 +30,8 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
   GatewayModule,
   GameModule,
   RoomModule,
-  ParticipantModule
+  ParticipantModule,
+  WalletModule
 ],
   controllers: [AppController],
   providers: [AppService],

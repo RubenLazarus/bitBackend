@@ -5,7 +5,7 @@ import { IUserService } from './users';
 import { FilterDTO } from 'src/utils/types';
 
 @Controller(Routes.USERS)
-// @UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard)
 export class UsersController {
   constructor(
     @Inject(Services.USERS)

@@ -4,6 +4,7 @@ export enum Routes {
     GAME = 'game', 
     ROOM = 'room', 
     PARTICIPANT = 'participant', 
+    WALLET = 'wallet', 
 }
 export enum Services {
     USERS = 'USERS_SERVICE', 
@@ -12,6 +13,7 @@ export enum Services {
     GAME = 'GAME_SERVICE',
     ROOM = 'ROOM_SERVICE',
     PARTICIPANT = 'PARTICIPANT_SERVICE',
+    WALLET = 'WALLET_SERVICE',
     GATEWAY_SESSION_MANAGER='GATEWAY_SESSION_MANAGER'
 }
 export enum Prioriyt {
@@ -30,6 +32,7 @@ export enum roomStatus {
     UPCOMING = 'Upcoming',
     CONTINUE = 'Continue',
     COMPLEDTED = 'Completed',
+    PENDING = 'Pending',
   }
 
   export enum Roles{

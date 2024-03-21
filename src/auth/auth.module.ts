@@ -11,9 +11,10 @@ import { OtpModule } from 'src/otp/otp.module';
 import { CommanModule } from 'src/comman/comman.module';
 import { smsService } from 'src/comman/sms.service';
 import { HttpModule } from '@nestjs/axios';
+import { WalletModule } from 'src/wallet/wallet.module';
 
 @Module({
-  imports: [OtpModule,UsersModule,CommanModule, MongooseModule.forFeature(entities),HttpModule],
+  imports: [OtpModule,UsersModule,CommanModule, MongooseModule.forFeature(entities),HttpModule,WalletModule],
   controllers: [AuthController],
   providers: [
     JwtStrategy,

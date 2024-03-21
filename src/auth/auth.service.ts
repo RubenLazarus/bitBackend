@@ -5,11 +5,13 @@ import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
 import { IOTPService } from 'src/otp/otp';
 import { smsService } from 'src/comman/sms.service';
+import { IWelletService } from 'src/wallet/wallet';
 @Injectable()
 export class AuthService {
   constructor(
     @Inject(Services.USERS) private userService: IUserService,
     @Inject(Services.OTP) private otpService: IOTPService,
+    @Inject(Services.WALLET) private walletService: IWelletService,
     private smsService: smsService
   ) { }
   async validateUser(user: any): Promise<any> {
@@ -78,7 +80,7 @@ export class AuthService {
         mobileNo: User.mobileNo
       }
 
-
+const addWallet = await this.walletService.createWellet(addNewuser?._id)
       const isSMSSend = await this.smsService.sentSMS(addNewuser, newOTP)
       if (isSMSSend) {
         await this.otpService.createOTP(OTPBody)
