@@ -22,12 +22,16 @@ export class ParticipantService {
             roomId: data?.roomId,
             userId: id
         }
-        let participantData = await this.participantRepository.create(object);
+        let isParticepentExist = await this.participantRepository.findOne(object)
+        if(!isParticepentExist){
+
+            isParticepentExist = await this.participantRepository.create(object);
+        }
         return {
             success: true,
             message: "new entry",
 
-            data: participantData
+            data: isParticepentExist
         }
 
     }
@@ -35,13 +39,15 @@ export class ParticipantService {
 
         let object: any = {
             color: data?.color,
-            bitAmount: data?.bitAmount ? parseInt(data?.bitAmount) : null,
+            bitAmount: data?.actualAmount * data?.contractCount,
             roomId: data?.roomId,
             userId: id,
+            actualAmount:data?.actualAmount,
+            contractCount:data?.contractCount,
             bitNumber: data?.bitNumber ? parseInt(data?.bitNumber) : null,
             createdAt: new Date()
         }
-        let walletAmount = await this.walletService.substractAmount(data, id)
+        let walletAmount = await this.walletService.substractAmount(object, id)
         if (!walletAmount?.success) {
             return walletAmount
         }
@@ -176,7 +182,7 @@ export class ParticipantService {
                     await this.walletService.addAmountInWallet(data, iterator?.userId)
                 }
             }
-            this.events.emit('user.result',iterator)
+            this.events.emit('user.result',data)
 
         }
     }
@@ -226,7 +232,9 @@ export class ParticipantService {
                 roomId:1,
                 color:1,
                 bitAmount:1,
-                bitNumber:1
+                bitNumber:1,
+                contractCount:1,
+                actualAmount:1
 
             }}
             ]);

@@ -63,25 +63,38 @@ export class Gateway
   async handleBitAmountorder(@MessageBody() data: any, @ConnectedSocket() client: any) {
 
     let newOrder = await this.ParticipantService.order(data, client?.user?._id);
-
+    console.log("new order", newOrder)
     client.emit("orderCreation", newOrder)
 
 
   }
   @OnEvent('user.result')
-  async resuletEvent(payload:any){
+  async resuletEvent(payload: any) {
     let userSocket = this.sessions.getUserSocket(payload?.userId)
     console.log(payload)
-    if(userSocket){
-      userSocket.emit('resultOfRoom',{success:true,message:"Please Reload"})
+    if (userSocket) {
+      userSocket.emit('resultOfRoom', { success: true, message: "Please Reload" })
     }
   }
-  @OnEvent('wallet.amount')
-  async walletAmountEvent(payload:any){
+  @OnEvent('announced.result')
+  async announcedResuletEvent(payload: any) {
     let userSocket = this.sessions.getUserSocket(payload?.userId)
     console.log(payload)
-    if(userSocket){
-      userSocket.emit('walletChange',payload)
+    let socket = this.sessions.getSockets()
+    socket.forEach(res => {
+      res.emit('resultOfRoom', payload)
+    })
+
+    // if (userSocket) {
+    //   userSocket.emit('resultOfRoom', { success: true, message: "Please Reload" })
+    // }
+  }
+  @OnEvent('wallet.amount')
+  async walletAmountEvent(payload: any) {
+    let userSocket = this.sessions.getUserSocket(payload?.userId)
+    console.log(payload)
+    if (userSocket) {
+      userSocket.emit('walletChange', payload)
     }
   }
 }

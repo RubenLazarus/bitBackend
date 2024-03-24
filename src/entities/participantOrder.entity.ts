@@ -25,6 +25,10 @@ export class participantOrder extends CommanDTO {
   bitAmount:number
   @Prop()
   bitNumber:number
+  @Prop()
+  contractCount:number
+  @Prop()
+  actualAmount:number
 
 
 

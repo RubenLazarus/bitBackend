@@ -1,4 +1,4 @@
-import { Body, Controller, Inject, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Post, Put, UseGuards } from '@nestjs/common';
 import { Routes, Services } from 'src/utils/constants';
 import { IRoomService } from './room';
 import { JwtAuthGuard } from 'src/auth/Guards/jwt.guard';
@@ -26,5 +26,9 @@ export class RoomController {
       @Post('submitResult')
       async submitResult(@Body() data:any){
         return await this.RoomService.submitResult(data)
+      }
+      @Get('getActiveRoom')
+      async getActiveRooms(){
+        return await this.RoomService.getActiveRooms()
       }
 }

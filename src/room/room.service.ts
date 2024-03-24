@@ -147,6 +147,22 @@ export class RoomService {
             );
         }
     }
+    async getActiveRooms() {
+        try {
+            let activeRoom = await this.roomRepository.findOne({ isContinue: true })
+            return {
+                success: true,
+                message: "Active Room",
+                activeRoom
+            };
+        } catch (e) {
+            throw new HttpException(
+                { success: false, message: e?.message },
+                HttpStatus.BAD_REQUEST,
+            );
+        }
+    }
+
 
     @Cron('* * * * * *')
     async regulateColorGame() {
@@ -204,7 +220,7 @@ export class RoomService {
         let updateroom = await this.roomRepository.findByIdAndUpdate(data?.roomId, { $set: object }, { new: true })
 
         this.paticipantService.sendMoneyToAllWinner(updateroom)
-
+        this.events.emit('announced.result', updateroom)
         return {
             success: true,
             message: "Result",
