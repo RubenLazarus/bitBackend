@@ -137,7 +137,7 @@ export class ParticipantService {
                             }
                             break;
                         }
-                        case COLOR.BLUE: {
+                        case COLOR.GREEN: {
                             if (data?.winNumber % 2 != 0 && data?.winNumber != 5) {
                                 let data = {
                                     amount: (iterator?.bitAmount * 2).toFixed(2)
@@ -154,7 +154,7 @@ export class ParticipantService {
                             }
                             break;
                         }
-                        case COLOR.GREEN: {
+                        case COLOR.VIOLET: {
                             if (data?.winNumber == 0 || data?.winNumber == 5) {
                                 let data = {
                                     amount: (iterator?.bitAmount * 4.5).toFixed(2)

@@ -43,7 +43,8 @@ export enum Roles {
 export enum COLOR {
   RED = 'Red',
   BLUE = 'Blue',
-  GREEN = 'Green'
+  GREEN = 'Green',
+  VIOLET = 'Violet'
 }
 export enum TNXType {
 DEBIT='Debit',
