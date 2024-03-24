@@ -1,8 +1,10 @@
-import { Injectable, UseGuards } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, UseGuards } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { transaction, transactionDetails } from 'src/entities/transaction.entity';
 import { wallet, walletDetails } from 'src/entities/wallet.entity';
+import { PaymentMode, TNXStatus, TNXType } from 'src/utils/constants';
 
 @Injectable()
 
@@ -10,6 +12,7 @@ export class WalletService {
     constructor(
         @InjectModel(transaction.name) private transactionRepository: Model<transactionDetails>,
         @InjectModel(wallet.name) private walletRepository: Model<walletDetails>,
+        private readonly events: EventEmitter2,
     ) { }
     async createWellet(id) {
         let object = {
@@ -23,41 +26,90 @@ export class WalletService {
         }
     }
     async addAmountInWallet(data, id) {
+        try {
+            let object: any = {
+                userId: id,
+                tnxAmount: data?.amount,
+                tnxType: TNXType?.CREDIT,
+                paymentMode: PaymentMode.WALLET,
+                createdAt: new Date()
 
-        let ammountAdded = await this.walletRepository.updateOne({ userId: id }, { $inc: { amount: data?.amount } }, { new: true })
-        return {
-            success: true,
-            message: "Amount has been added",
-            data: ammountAdded
+            }
+            let ammountAdded = await this.walletRepository.findOneAndUpdate({ userId: id }, { $inc: { amount: data?.amount } }, { new: true })
+            if (!ammountAdded) {
+                object.tnxStatus = TNXStatus.FAILED
+            } else {
+                object.tnxStatus = TNXStatus.SUCCESS
+                object.walletId = ammountAdded?._id
+            }
+            await this.createTransition(object)
 
+            this.events.emit('wallet.amount',ammountAdded)
+            return {
+                success: true,
+                message: "Amount has been added",
+                data: ammountAdded
+
+            }
+
+        } catch (e) {
+            throw new HttpException(
+                { success: false, message: e?.message },
+                HttpStatus.BAD_REQUEST,
+            );
         }
+
     }
     async substractAmount(data, id) {
+        try {
+            let object: any = {
+                userId: id,
+                tnxAmount: data?.bitAmount,
+                tnxType: TNXType?.DEBIT,
+                paymentMode: PaymentMode.WALLET,
+                createdAt: new Date()
 
-        let walletAmount = await this.walletRepository.findOne({userId:id});
-        if(!walletAmount){
-            return {
-                success:false,
-                message:"Insufficesnt Amount"
             }
-        }
-        if(data?.bitAmount>walletAmount?.amount){
+            let walletAmount = await this.walletRepository.findOne({ userId: id });
+            if (!walletAmount) {
+                return {
+                    success: false,
+                    message: "Insufficesnt Amount"
+                }
+            }
+            if (data?.bitAmount > walletAmount?.amount) {
+                return {
+                    success: false,
+                    message: "Insufficesnt Amount"
+                }
+            }
+
+            let ammountSubstract = await this.walletRepository.findOneAndUpdate({ userId: id }, { $inc: { amount: -data?.bitAmount } }, { new: true })
+            if (!ammountSubstract) {
+                object.tnxStatus = TNXStatus.FAILED
+            } else {
+                object.tnxStatus = TNXStatus.SUCCESS
+                object.walletId = ammountSubstract?._id
+            }
+            await this.createTransition(object);
+            this.events.emit('wallet.amount',ammountSubstract)
             return {
-                success:false,
-                message:"Insufficesnt Amount"
-            } 
+                success: true,
+                message: "Amount has been Deducted",
+                data: ammountSubstract
+
+            }
+        } catch (e) {
+            throw new HttpException(
+                { success: false, message: e?.message },
+                HttpStatus.BAD_REQUEST,
+            );
         }
 
-        let ammountSubstract = await this.walletRepository.updateOne({ userId: id }, { $inc: { amount: -data?.bitAmount } }, { new: true })
-        return {
-            success: true,
-            message: "Amount has been Deducted",
-            data: ammountSubstract
 
-        }
     }
-    async getAmountByUserId(id){
-        let wallet = await this.walletRepository.findOne({userId:id})
+    async getAmountByUserId(id) {
+        let wallet = await this.walletRepository.findOne({ userId: id })
         return {
             success: true,
             message: "Amount has been Found",
@@ -65,5 +117,15 @@ export class WalletService {
 
         }
     }
+    async createTransition(data: any) {
+        try {
+            return this.transactionRepository.create(data)
 
+        } catch (e) {
+            throw new HttpException(
+                { success: false, message: e?.message },
+                HttpStatus.BAD_REQUEST,
+            );
+        }
+    }
 }

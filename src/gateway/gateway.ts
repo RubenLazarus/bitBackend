@@ -68,4 +68,20 @@ export class Gateway
 
 
   }
+  @OnEvent('user.result')
+  async resuletEvent(payload:any){
+    let userSocket = this.sessions.getUserSocket(payload?.userId)
+    console.log(payload)
+    if(userSocket){
+      userSocket.emit('resultOfRoom',{success:true,message:"Please Reload"})
+    }
+  }
+  @OnEvent('wallet.amount')
+  async walletAmountEvent(payload:any){
+    let userSocket = this.sessions.getUserSocket(payload?.userId)
+    console.log(payload)
+    if(userSocket){
+      userSocket.emit('walletChange',payload)
+    }
+  }
 }

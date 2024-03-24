@@ -1,8 +1,10 @@
-import { Body, Controller, Inject, Post, Put } from '@nestjs/common';
+import { Body, Controller, Inject, Post, Put, UseGuards } from '@nestjs/common';
 import { Routes, Services } from 'src/utils/constants';
 import { IRoomService } from './room';
+import { JwtAuthGuard } from 'src/auth/Guards/jwt.guard';
 
 @Controller(Routes.ROOM)
+@UseGuards(JwtAuthGuard)
 export class RoomController {
     constructor(
         @Inject(Services.ROOM)

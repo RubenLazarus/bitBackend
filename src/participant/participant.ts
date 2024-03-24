@@ -5,4 +5,5 @@ export interface IParticipantService {
     getAllParticipantByRoomId(data:any)
     getTotalAmountByRoomId(data:any)
     sendMoneyToAllWinner(data:any)
+    orderListByParticipant(data:any,id:any)
 }

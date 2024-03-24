@@ -13,6 +13,12 @@ export class transaction extends CommanDTO {
     tnxAmount:number
     @Prop()
     tnxStatus:string
+    @Prop()
+    tnxNumber:string
+    @Prop()
+    tnxType:string
+    @Prop()
+    paymentMode:string
     @Prop({ type: String, ref: 'wallets'})
     walletId:string
 

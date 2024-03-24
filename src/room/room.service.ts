@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
 import { Cron } from '@nestjs/schedule';
@@ -74,26 +74,77 @@ export class RoomService {
             data: updataedStatus
         }
     }
-    async getAllRooms(data) {
-        let object: any = {}
-        if (data?.gameId) {
-            object.gameId = data?.gameId
-        }
-        let allRooms = await this.roomRepository.aggregate([{
-            $match: object
-        }, {
-            $lookup: {
-                from: 'games',
-                localField: 'gameId',
-                foreignField: '_id',
-                as: 'gameData',
-            },
-        }
-        ])
-        return {
-            success: true,
-            message: "All Room",
-            data: allRooms
+    async getAllRooms(filters) {
+        try {
+            for (const key in filters) {
+                if (
+                    filters.hasOwnProperty(key) &&
+                    (filters[key] === null ||
+                        filters[key] === undefined ||
+                        filters[key] === '')
+                ) {
+                    delete filters[key];
+                }
+            }
+            if (!filters?.gameId) {
+                return {
+                    success: false,
+                    message: "Plese send Game Id"
+
+                }
+            }
+            var pageNumber = 1;
+            var pageSize = 0;
+            if (filters?.pageNumber) {
+                pageNumber = filters.pageNumber;
+            }
+            if (filters?.pageSize) {
+                pageSize = filters.pageSize;
+            }
+
+            var searchFilters = [];
+            searchFilters.push(
+                { isDeleted: false },
+                { isActive: true },
+                { gameId: filters?.gameId }
+            );
+            if (filters?.status) {
+                searchFilters.push({ userStatus: filters?.status });
+            }
+
+            const roomsCount = await this.roomRepository
+                .find({ $and: searchFilters })
+                .countDocuments();
+            var numberOfPages = pageSize === 0 ? 1 : Math.ceil(roomsCount / pageSize);
+            const roomsList = await this.roomRepository.aggregate([
+                { $match: { $and: searchFilters } },
+                { $sort: { createdAt: -1 } },
+                { $skip: (pageNumber - 1) * pageSize },
+                { $limit: pageSize ? pageSize : Number.MAX_SAFE_INTEGER },
+                {
+                    $project: {
+                        _id: 1,
+                        status: 1,
+                        startTime: 1,
+                        endTime: 1,
+                        totalAmount: 1,
+                        winColor: 1,
+                        winNumber: 1,
+
+                    }
+                }
+            ]);
+            return {
+                success: true,
+                message: "Order List",
+                roomsList,
+                numberOfPages,
+            };
+        } catch (e) {
+            throw new HttpException(
+                { success: false, message: e?.message },
+                HttpStatus.BAD_REQUEST,
+            );
         }
     }
 
@@ -147,17 +198,17 @@ export class RoomService {
             totalAmount: totalAmount?.data[0]?.sum,
             winColor: data?.winColor,
             winNumber: data?.winNumber,
-            isContinue:false,
-            status:roomStatus.COMPLEDTED
+            isContinue: false,
+            status: roomStatus.COMPLEDTED
         }
         let updateroom = await this.roomRepository.findByIdAndUpdate(data?.roomId, { $set: object }, { new: true })
 
         this.paticipantService.sendMoneyToAllWinner(updateroom)
 
         return {
-            success:true,
-            message:"Result",
-            data:updateroom
+            success: true,
+            message: "Result",
+            data: updateroom
         }
     }
 }

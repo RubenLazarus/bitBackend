@@ -19,4 +19,8 @@ export class ParticipantController {
     async getAllParticipantByRoomId(@Body() data: any) {
         return await this.ParticipantService.getAllParticipantByRoomId(data)
     }
+     @Post('orderListByParticipant')
+    async orderListByParticipant(@Body() data: any, @GetId() id) {
+        return await this.ParticipantService.orderListByParticipant(data,id)
+    }
 }
