@@ -6,11 +6,13 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { entities } from 'src/utils/entities';
 import { Services } from 'src/utils/constants';
 import { GameModule } from 'src/game/game.module';
+import { ParticipantModule } from 'src/participant/participant.module';
 @Module({
   imports: [
     ScheduleModule.forRoot(),
     MongooseModule.forFeature(entities),
-    GameModule
+    GameModule,
+    ParticipantModule
   ],
   controllers: [RoomController],
   providers: [{

@@ -4,10 +4,11 @@ import { ParticipantService } from './participant.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { entities } from 'src/utils/entities';
 import { Services } from 'src/utils/constants';
+import { WalletModule } from 'src/wallet/wallet.module';
 
 @Module({
   imports: [
-    MongooseModule.forFeature(entities)
+    MongooseModule.forFeature(entities),WalletModule
   ],
   controllers: [ParticipantController],
   providers: [{

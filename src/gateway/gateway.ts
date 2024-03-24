@@ -59,4 +59,13 @@ export class Gateway
 
 
   }
+  @SubscribeMessage('bitAmountOrder')
+  async handleBitAmountorder(@MessageBody() data: any, @ConnectedSocket() client: any) {
+
+    let newOrder = await this.ParticipantService.order(data, client?.user?._id);
+
+    client.emit("orderCreation", newOrder)
+
+
+  }
 }

@@ -32,6 +32,30 @@ export class WalletService {
 
         }
     }
+    async substractAmount(data, id) {
+
+        let walletAmount = await this.walletRepository.findOne({userId:id});
+        if(!walletAmount){
+            return {
+                success:false,
+                message:"Insufficesnt Amount"
+            }
+        }
+        if(data?.bitAmount>walletAmount?.amount){
+            return {
+                success:false,
+                message:"Insufficesnt Amount"
+            } 
+        }
+
+        let ammountSubstract = await this.walletRepository.updateOne({ userId: id }, { $inc: { amount: -data?.bitAmount } }, { new: true })
+        return {
+            success: true,
+            message: "Amount has been Deducted",
+            data: ammountSubstract
+
+        }
+    }
     async getAmountByUserId(id){
         let wallet = await this.walletRepository.findOne({userId:id})
         return {

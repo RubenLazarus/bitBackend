@@ -5,6 +5,7 @@ import { Cron } from '@nestjs/schedule';
 import { Model } from 'mongoose';
 import { room, roomDetails } from 'src/entities/room.entity';
 import { IGameService } from 'src/game/game';
+import { IParticipantService } from 'src/participant/participant';
 import { Services, roomStatus } from 'src/utils/constants';
 
 @Injectable()
@@ -14,6 +15,8 @@ export class RoomService {
         private readonly events: EventEmitter2,
         @Inject(Services.GAME)
         private readonly gameService: IGameService,
+        @Inject(Services.PARTICIPANT)
+        private readonly paticipantService: IParticipantService,
     ) { }
     async createRoom(data) {
         let currentTime = new Date()
@@ -24,7 +27,6 @@ export class RoomService {
             startTime: currentTime,
             endTime: (currentTime.getTime() + data?.time * 60000)
         }
-
         let createdRoom = await this.roomRepository.create(object)
         this.events.emit('color.newroom', {
             success: true,
@@ -132,18 +134,30 @@ export class RoomService {
 
     }
 
-    // async submitResult(data) {
-    //     if (!data?.roomId) {
-    //         return {
-    //             success: false,
-    //             message: "please send Room Id"
-    //         }
-    //     }
-    //     let object = {
-    //         totalAmount:
-    //             winColor: data?.winColor,
-    //         winNumber: data?.winNumber
-    //     }
+    async submitResult(data) {
+        if (!data?.roomId) {
+            return {
+                success: false,
+                message: "please send Room Id"
+            }
+        }
+        let totalAmount = await this.paticipantService.getTotalAmountByRoomId(data);
 
-    // }
+        let object = {
+            totalAmount: totalAmount?.data[0]?.sum,
+            winColor: data?.winColor,
+            winNumber: data?.winNumber,
+            isContinue:false,
+            status:roomStatus.COMPLEDTED
+        }
+        let updateroom = await this.roomRepository.findByIdAndUpdate(data?.roomId, { $set: object }, { new: true })
+
+        this.paticipantService.sendMoneyToAllWinner(updateroom)
+
+        return {
+            success:true,
+            message:"Result",
+            data:updateroom
+        }
+    }
 }

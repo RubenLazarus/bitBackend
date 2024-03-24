@@ -22,7 +22,9 @@ export class participantOrder extends CommanDTO {
   @IsNotEmpty()
   color:COLOR
   @Prop()
-  bitAmmount:number
+  bitAmount:number
+  @Prop()
+  bitNumber:number
 
 
 

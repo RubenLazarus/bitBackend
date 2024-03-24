@@ -3,4 +3,6 @@ export interface IParticipantService {
     order(data:any,id)
     getAllParticipant(data:any)
     getAllParticipantByRoomId(data:any)
+    getTotalAmountByRoomId(data:any)
+    sendMoneyToAllWinner(data:any)
 }
