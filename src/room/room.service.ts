@@ -221,7 +221,7 @@ export class RoomService {
 
 
         let object = {
-            totalAmount: totalAmount?.data ? totalAmount?.data[0]?.sum : 0,
+            totalAmount: totalAmount?.data?.length>0 ? totalAmount?.data[0]?.sum : 0,
             winColor: data?.winColor,
             winNumber: data?.winNumber,
             isContinue: false,
