@@ -6,7 +6,7 @@ import { Model } from 'mongoose';
 import { room, roomDetails } from 'src/entities/room.entity';
 import { IGameService } from 'src/game/game';
 import { IParticipantService } from 'src/participant/participant';
-import { Services, roomStatus } from 'src/utils/constants';
+import { COLOR, Services, roomStatus } from 'src/utils/constants';
 
 @Injectable()
 export class RoomService {
@@ -196,7 +196,16 @@ export class RoomService {
                 status: roomStatus.PENDING,
                 isContinue: false
             }
-            await this.changeStatus(data)
+            // await this.changeStatus(data)
+            const randomNumber = Math.floor(Math.random() * 10);
+            const randomColorKey = Object.keys(COLOR)[Math.floor(Math.random() * Object.keys(COLOR).length)];
+            const randomColorValue = COLOR[randomColorKey];
+            let dataSubmit = {
+                roomId: room?._id,
+                winColor: randomColorValue,
+                winNumber: randomNumber
+            }
+            await this.submitResult(dataSubmit)
         }
 
     }
@@ -210,8 +219,9 @@ export class RoomService {
         }
         let totalAmount = await this.paticipantService.getTotalAmountByRoomId(data);
 
+
         let object = {
-            totalAmount: totalAmount?.data[0]?.sum,
+            totalAmount: totalAmount?.data ? totalAmount?.data[0]?.sum : 0,
             winColor: data?.winColor,
             winNumber: data?.winNumber,
             isContinue: false,

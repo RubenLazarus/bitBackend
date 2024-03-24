@@ -42,7 +42,6 @@ export enum Roles {
 }
 export enum COLOR {
   RED = 'Red',
-  BLUE = 'Blue',
   GREEN = 'Green',
   VIOLET = 'Violet'
 }

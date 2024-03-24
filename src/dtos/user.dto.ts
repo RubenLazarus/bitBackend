@@ -16,7 +16,7 @@ export class CreateUserDto {
 
   @IsNotEmpty()
   mobileNo: string;
-  @IsNotEmpty()
+
   @IsString()
   refrenceCode: string;
   
