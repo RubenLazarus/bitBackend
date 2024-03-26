@@ -79,7 +79,7 @@ export class UsersService {
 
   }
 
-  getAllUser(filters) {
+  async getAllUser(filters) {
     try {
       for (const key in filters) {
         if (
@@ -89,7 +89,7 @@ export class UsersService {
             filters[key] === '')
         ) {
           delete filters[key];
-        }
+        }    }
         var pageNumber = 1;
         var pageSize = 0;
         if (filters?.pageNumber) {
@@ -104,7 +104,40 @@ export class UsersService {
           { isDeleted: false },
           { isActive: true }
         );
+        if(filters?.role){
+          searchFilters.push({role:filters?.role})
+        }
+  
+      const roomsCount = await this.userRepository
+      .find({ $and: searchFilters })
+      .countDocuments();
+  var numberOfPages = pageSize === 0 ? 1 : Math.ceil(roomsCount / pageSize);
+  const roomsList = await this.userRepository.aggregate([
+      { $match: { $and: searchFilters } },
+      { $sort: { createdAt: -1 } },
+      { $skip: (pageNumber - 1) * pageSize },
+      { $limit: pageSize ? pageSize : Number.MAX_SAFE_INTEGER },
+      {
+          $project: {
+              _id: 1,
+              createdAt: 1,
+              firstName: 1,
+              lastName: 1,
+              displayName: 1,
+              mobileNo: 1,
+              role: 1,
+              uniqueCode: 1,
+              isActive: 1,
+
+          }
       }
+  ]);
+  return {
+      success: true,
+      message: "Order List",
+      roomsList,
+      numberOfPages,
+  };
     } catch (e) {
       throw new HttpException(
         { success: false, message: e?.message },
