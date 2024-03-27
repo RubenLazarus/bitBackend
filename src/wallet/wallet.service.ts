@@ -117,6 +117,74 @@ export class WalletService {
 
         }
     }
+    async getTnxByUserId(filters,id) {
+        try {
+            for (const key in filters) {
+              if (
+                filters.hasOwnProperty(key) &&
+                (filters[key] === null ||
+                  filters[key] === undefined ||
+                  filters[key] === '')
+              ) {
+                delete filters[key];
+              }    }
+              var pageNumber = 1;
+              var pageSize = 0;
+              if (filters?.pageNumber) {
+                pageNumber = filters.pageNumber;
+              }
+              if (filters?.pageSize) {
+                pageSize = filters.pageSize;
+              }
+      
+              var searchFilters = [];
+              searchFilters.push(
+                { isDeleted: false },
+                { isActive: true },
+                { userId: id }
+              );
+              if(filters?.role){
+                searchFilters.push({role:filters?.role})
+              }
+        
+            const tnxCount = await this.transactionRepository
+            .find({ $and: searchFilters })
+            .countDocuments();
+        var numberOfPages = pageSize === 0 ? 1 : Math.ceil(tnxCount / pageSize);
+        const tnxList = await this.transactionRepository.aggregate([
+            { $match: { $and: searchFilters } },
+            { $sort: { createdAt: -1 } },
+            { $skip: (pageNumber - 1) * pageSize },
+            { $limit: pageSize ? pageSize : Number.MAX_SAFE_INTEGER },
+            {
+                $project: {
+                    _id: 1,
+                    createdAt: 1,
+                    userId: 1,
+                    tnxStatus: 1,
+                    tnxAmount: 1,
+                    tnxType: 1,
+                    role: 1,
+                    paymentMode: 1,
+                    walletId: 1,
+      
+                }
+            }
+        ]);
+        return {
+            success: true,
+            message: "Transaction List",
+            tnxList,
+            numberOfPages,
+        };
+          } catch (e) {
+            throw new HttpException(
+              { success: false, message: e?.message },
+              HttpStatus.BAD_REQUEST,
+            );
+          }
+        
+    }
     async createTransition(data: any) {
         try {
             return this.transactionRepository.create(data)

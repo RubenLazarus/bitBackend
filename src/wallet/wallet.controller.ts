@@ -26,4 +26,9 @@ export class WalletController {
     {
         return await this.WalletService.getAmountByUserId(id)
     }
+    @Post('getTnxByUserId')
+    async getTnxByUserId(@Body() data:any ,@GetId() id:string)
+    {
+        return await this.WalletService.getTnxByUserId(data,id)
+    }
 }
