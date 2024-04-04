@@ -1,7 +1,7 @@
 import { Inject } from "@nestjs/common";
 import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { Server } from "socket.io";
-import { Services } from "src/utils/constants";
+import { Roles, Services } from "src/utils/constants";
 import { AuthenticatedSocket } from "src/utils/interface";
 import { IGatewaySessionManager } from "./gateway.session";
 import { OnEvent } from "@nestjs/event-emitter";
@@ -62,10 +62,20 @@ export class Gateway
   @SubscribeMessage('bitAmountOrder')
   async handleBitAmountorder(@MessageBody() data: any, @ConnectedSocket() client: any) {
 
-    let newOrder = await this.ParticipantService.order(data, client?.user?._id);
-    console.log("new order", newOrder)
-    client.emit("orderCreation", newOrder)
+    let newOrder:any = await this.ParticipantService.order(data, client?.user?._id);
+  
+// if(newOrder && newOrder?.success){
+//   newOrder.data.userName = client?.user?.displayName
+//     console.log("new order", newOrder,newOrder.data.userName)
+// }
+    let socket = this.sessions.getSockets()
+    socket.forEach(res => {
+      if(res?.user?.role==Roles.ADMIN || res?.user?.role==Roles.SUPERADMIN){
 
+        res.emit('newOrder', newOrder)
+      }
+    })
+    client.emit("orderCreation", newOrder)
 
   }
   @OnEvent('user.result')
@@ -83,6 +93,20 @@ export class Gateway
     let socket = this.sessions.getSockets()
     socket.forEach(res => {
       res.emit('resultOfRoom', payload)
+    })
+
+    // if (userSocket) {
+    //   userSocket.emit('resultOfRoom', { success: true, message: "Please Reload" })
+    // }
+  }
+  @OnEvent('announced.update_ststus')
+  async updateStatus(payload: any) {
+    let socket = this.sessions.getSockets()
+    socket.forEach(res => {
+      if(res?.user?.role==Roles.ADMIN || res?.user?.role==Roles.SUPERADMIN){
+
+        res.emit('updatedStatus', payload)
+      }
     })
 
     // if (userSocket) {

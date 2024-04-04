@@ -68,6 +68,8 @@ export class RoomService {
         let updataedStatus = await this.roomRepository.findByIdAndUpdate(data?.roomId, {
             $set: object
         }, { new: true })
+        console.log('announced.update_ststus HIT')
+        this.events.emit('announced.update_ststus', updataedStatus)
         return {
             success: true,
             message: "changes Update",

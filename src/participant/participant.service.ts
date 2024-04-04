@@ -23,7 +23,7 @@ export class ParticipantService {
             userId: id
         }
         let isParticepentExist = await this.participantRepository.findOne(object)
-        if(!isParticepentExist){
+        if (!isParticepentExist) {
 
             isParticepentExist = await this.participantRepository.create(object);
         }
@@ -42,8 +42,8 @@ export class ParticipantService {
             bitAmount: data?.actualAmount * data?.contractCount,
             roomId: data?.roomId,
             userId: id,
-            actualAmount:data?.actualAmount,
-            contractCount:data?.contractCount,
+            actualAmount: data?.actualAmount,
+            contractCount: data?.contractCount,
             bitNumber: data?.bitNumber ? parseInt(data?.bitNumber) : null,
             createdAt: new Date()
         }
@@ -52,10 +52,43 @@ export class ParticipantService {
             return walletAmount
         }
         let order = await this.participantOrderRepository.create(object)
+        let findOrder = await this.participantOrderRepository.aggregate([
+            { $match: {
+                _id: order?._id
+            }},{
+                $lookup: {
+                    from: "users",
+                    localField: "userId",
+                    foreignField: "_id",
+                    as: "userData"
+                }
+            },{
+                $unwind: {
+                    path: '$userData',
+                    preserveNullAndEmptyArrays: true,
+                },
+            },
+            {
+                $project: {
+                    _id: 1,
+                    roomId: 1,
+                    color: 1,
+                    bitAmount: 1,
+                    bitNumber: 1,
+                    contractCount: 1,
+                    actualAmount: 1,
+                    'userData.displayName': 1,
+                    'userData.mobileNo': 1,
+                    'userData._id': 1,
+
+                }
+            }
+    
+    ])
         return {
             success: true,
             message: "order crearted",
-            data: order
+            data: findOrder
         }
 
     }
@@ -182,7 +215,7 @@ export class ParticipantService {
                     await this.walletService.addAmountInWallet(data, iterator?.userId)
                 }
             }
-            this.events.emit('user.result',data)
+            this.events.emit('user.result', data)
 
         }
     }
@@ -227,16 +260,116 @@ export class ParticipantService {
                 { $sort: { createdAt: -1 } },
                 { $skip: (pageNumber - 1) * pageSize },
                 { $limit: pageSize ? pageSize : Number.MAX_SAFE_INTEGER },
-            {$project:{
-                _id:1,
-                roomId:1,
-                color:1,
-                bitAmount:1,
-                bitNumber:1,
-                contractCount:1,
-                actualAmount:1
+                {
+                    $project: {
+                        _id: 1,
+                        roomId: 1,
+                        color: 1,
+                        bitAmount: 1,
+                        bitNumber: 1,
+                        contractCount: 1,
+                        actualAmount: 1
 
-            }}
+                    }
+                }
+            ]);
+            return {
+                success: true,
+                message: "Order List",
+                participantOrderList,
+                numberOfPages,
+            };
+        } catch (e) {
+            throw new HttpException(
+                { success: false, message: e?.message },
+                HttpStatus.BAD_REQUEST,
+            );
+        }
+    }
+
+    async colorGameParticipantCalcularion() {
+
+        try {
+            // let calculatedData = this.participantOrderRepository.aggregate([{}])
+
+        } catch (e) {
+            throw new HttpException(
+                { success: false, message: e?.message },
+                HttpStatus.BAD_REQUEST,
+            );
+        }
+    }
+
+    async getAllOrderListByRoomId(filters) {
+        try {
+            for (const key in filters) {
+                if (
+                    filters.hasOwnProperty(key) &&
+                    (filters[key] === null ||
+                        filters[key] === undefined ||
+                        filters[key] === '')
+                ) {
+                    delete filters[key];
+                }
+            }
+            var pageNumber = 1;
+            var pageSize = 0;
+            if (filters?.pageNumber) {
+                pageNumber = filters.pageNumber;
+            }
+            if (filters?.pageSize) {
+                pageSize = filters.pageSize;
+            }
+
+            var searchFilters = [];
+            searchFilters.push(
+                { isDeleted: false },
+                { isActive: true }, {
+                roomId: filters?.roomId
+            }
+            );
+            if (filters?.status) {
+                searchFilters.push({ userStatus: filters?.status });
+            }
+
+            const participantOrderCount = await this.participantOrderRepository
+                .find({ $and: searchFilters })
+                .countDocuments();
+            var numberOfPages = pageSize === 0 ? 1 : Math.ceil(participantOrderCount / pageSize);
+            const participantOrderList = await this.participantOrderRepository.aggregate([
+                { $match: { $and: searchFilters } },
+                {
+                    $lookup: {
+                        from: "users",
+                        localField: "userId",
+                        foreignField: "_id",
+                        as: "userData"
+                    }
+                },
+                {
+                    $unwind: {
+                        path: '$userData',
+                        preserveNullAndEmptyArrays: true,
+                    },
+                },
+                { $sort: { createdAt: -1 } },
+                { $skip: (pageNumber - 1) * pageSize },
+                { $limit: pageSize ? pageSize : Number.MAX_SAFE_INTEGER },
+                {
+                    $project: {
+                        _id: 1,
+                        roomId: 1,
+                        color: 1,
+                        bitAmount: 1,
+                        bitNumber: 1,
+                        contractCount: 1,
+                        actualAmount: 1,
+                        'userData.displayName': 1,
+                        'userData.mobileNo': 1,
+                        'userData._id': 1,
+
+                    }
+                }
             ]);
             return {
                 success: true,
