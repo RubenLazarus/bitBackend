@@ -36,7 +36,7 @@ export class Gateway
   handleConnection(socket: AuthenticatedSocket, ...args: any[]) {
     console.log('Incoming Connection');
     this.sessions.setUserSocket(socket.user._id, socket);
-    console.log("userLocked in with id ", socket.user?._id)
+    console.log("userLocked in with id ", socket.user?._id,socket.user)
     socket.emit('connected', { status: 'good' });
 
   }
@@ -62,15 +62,15 @@ export class Gateway
   @SubscribeMessage('bitAmountOrder')
   async handleBitAmountorder(@MessageBody() data: any, @ConnectedSocket() client: any) {
 
-    let newOrder:any = await this.ParticipantService.order(data, client?.user?._id);
-  
-// if(newOrder && newOrder?.success){
-//   newOrder.data.userName = client?.user?.displayName
-//     console.log("new order", newOrder,newOrder.data.userName)
-// }
+    let newOrder: any = await this.ParticipantService.order(data, client?.user?._id);
+
+    // if(newOrder && newOrder?.success){
+    //   newOrder.data.userName = client?.user?.displayName
+    //     console.log("new order", newOrder,newOrder.data.userName)
+    // }
     let socket = this.sessions.getSockets()
     socket.forEach(res => {
-      if(res?.user?.role==Roles.ADMIN || res?.user?.role==Roles.SUPERADMIN){
+      if (res?.user?.role == Roles.ADMIN || res?.user?.role == Roles.SUPERADMIN) {
 
         res.emit('newOrder', newOrder)
       }
@@ -89,7 +89,7 @@ export class Gateway
   @OnEvent('announced.result')
   async announcedResuletEvent(payload: any) {
     let userSocket = this.sessions.getUserSocket(payload?.userId)
-    console.log(payload)
+    // console.log(payload)
     let socket = this.sessions.getSockets()
     socket.forEach(res => {
       res.emit('resultOfRoom', payload)
@@ -103,8 +103,9 @@ export class Gateway
   async updateStatus(payload: any) {
     let socket = this.sessions.getSockets()
     socket.forEach(res => {
-      if(res?.user?.role==Roles.ADMIN || res?.user?.role==Roles.SUPERADMIN){
-
+      // console.log(res?.user, "1")
+      if (res?.user?.role == Roles.ADMIN || res?.user?.role == Roles.SUPERADMIN) {
+        // console.log(res?.user, "2")
         res.emit('updatedStatus', payload)
       }
     })
