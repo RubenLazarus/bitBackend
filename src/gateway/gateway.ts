@@ -36,7 +36,7 @@ export class Gateway
   handleConnection(socket: AuthenticatedSocket, ...args: any[]) {
     console.log('Incoming Connection');
     this.sessions.setUserSocket(socket.user._id, socket);
-    console.log("userLocked in with id ", socket.user?._id,socket.user)
+    console.log("userLocked in with id ", socket.user?._id, socket.user)
     socket.emit('connected', { status: 'good' });
 
   }
@@ -53,7 +53,7 @@ export class Gateway
   async handleCreateNewParticipant(@MessageBody() data: any, @ConnectedSocket() client: any) {
     console.log(data, client?.user)
 
-    let newParticipant = await this.ParticipantService.createParticipant(data, client?.user?._id);
+    let newParticipant = await this.ParticipantService.createNewLuckyHitParticipant(data, client?.user?._id);
 
     client.emit("newParticipant", newParticipant)
 
@@ -86,6 +86,7 @@ export class Gateway
       userSocket.emit('resultOfRoom', { success: true, message: "Please Reload" })
     }
   }
+
   @OnEvent('announced.result')
   async announcedResuletEvent(payload: any) {
     let userSocket = this.sessions.getUserSocket(payload?.userId)
@@ -99,6 +100,7 @@ export class Gateway
     //   userSocket.emit('resultOfRoom', { success: true, message: "Please Reload" })
     // }
   }
+
   @OnEvent('announced.update_ststus')
   async updateStatus(payload: any) {
     let socket = this.sessions.getSockets()
@@ -121,5 +123,55 @@ export class Gateway
     if (userSocket) {
       userSocket.emit('walletChange', payload)
     }
+  }
+  // Lucky Hit
+
+
+  @OnEvent('luckyhit.newroom')
+  handleluckyHitRoom(payload: any) {
+    let socket = this.sessions.getSockets()
+    socket.forEach(res => {
+      res.emit('luckyHitRoom', payload)
+    })
+  }
+  @OnEvent('announced.update_status_lucky_hit')
+  async update_status_lucky_hit(payload: any) {
+    let socket = this.sessions.getSockets()
+    socket.forEach(res => {
+      if (res?.user?.role == Roles.ADMIN || res?.user?.role == Roles.SUPERADMIN) {
+        res.emit('updatedStatusLuckyHit', payload)
+      }
+    })
+  }
+  @SubscribeMessage('CreateNewLuckyHitParticipant')
+  async handleCreateNewLuckyHitParticipant(@MessageBody() data: any, @ConnectedSocket() client: any) {
+    console.log(data, client?.user)
+
+    let newParticipant = await this.ParticipantService.createNewLuckyHitParticipant(data, client?.user?._id);
+
+    client.emit("newParticipant", newParticipant)
+
+
+  }
+  @OnEvent('user.lucky.hit')
+  async resuletLuckyHitEvent(payload: any) {
+    let userSocket = this.sessions.getUserSocket(payload?.userId)
+    console.log(payload)
+    if (userSocket) {
+      userSocket.emit('resultOfRoomLuckyHit', { success: true, message: "Please Reload" })
+    }
+  }
+  @OnEvent('announced.result.lucky.hit')
+  async announcedResuletLuckyHitEvent(payload: any) {
+    let userSocket = this.sessions.getUserSocket(payload?.userId)
+    // console.log(payload)
+    let socket = this.sessions.getSockets()
+    socket.forEach(res => {
+      res.emit('resultOfRoomLuckyHit', payload)
+    })
+
+    // if (userSocket) {
+    //   userSocket.emit('resultOfRoom', { success: true, message: "Please Reload" })
+    // }
   }
 }

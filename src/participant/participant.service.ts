@@ -2,15 +2,19 @@ import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { luckyHitParticipant, luckyHitParticipantDetails } from 'src/entities/luckyhitparticipant.entity';
+import { luckyHitParticipantOrder, luckyHitParticipantOrderDetails } from 'src/entities/luckyhitparticipantOrder.entity';
 import { participant, participantDetails } from 'src/entities/participant.entity';
 import { participantOrder, participantOrderDetails } from 'src/entities/participantOrder.entity';
-import { COLOR, Services, roomStatus } from 'src/utils/constants';
+import { COLOR, COLORLUCKYHIT, Services, roomStatus } from 'src/utils/constants';
 import { IWelletService } from 'src/wallet/wallet';
 
 @Injectable()
 export class ParticipantService {
     constructor(
+        @InjectModel(luckyHitParticipantOrder.name) private luckyhitparticipantOrderRepository : Model<luckyHitParticipantOrderDetails>,
         @InjectModel(participant.name) private participantRepository: Model<participantDetails>,
+        @InjectModel(luckyHitParticipant.name) private luckyhitparticipantRepository: Model<luckyHitParticipantDetails>,
         @InjectModel(participantOrder.name) private participantOrderRepository: Model<participantOrderDetails>,
         private readonly events: EventEmitter2,
         @Inject(Services.WALLET)
@@ -35,6 +39,7 @@ export class ParticipantService {
         }
 
     }
+
     async order(data, id) {
 
         let object: any = {
@@ -382,6 +387,77 @@ export class ParticipantService {
                 { success: false, message: e?.message },
                 HttpStatus.BAD_REQUEST,
             );
+        }
+    }
+
+    //Lucky hit
+    async createNewLuckyHitParticipant(data, id) {
+
+        let object: any = {
+            roomId: data?.roomId,
+            userId: id
+        }
+        let isParticepentExist = await this.luckyhitparticipantRepository.findOne(object)
+        if (!isParticepentExist) {
+
+            isParticepentExist = await this.luckyhitparticipantRepository.create(object);
+        }
+        return {
+            success: true,
+            message: "new entry",
+
+            data: isParticepentExist
+        }
+
+    }
+    async getTotalAmountByRoomIdForLuckyHit(data) {
+        let totalAmount = await this.luckyhitparticipantOrderRepository.aggregate([{
+            $match: { roomId: data?.roomId }
+        },
+        {
+            $group: { _id: null, sum: { $sum: "$bitAmount" } }
+        }
+        ]);
+        console.log(totalAmount)
+        return {
+            success: true,
+            message: "Total amount",
+            data: totalAmount
+        }
+    }
+    async sendMoneyToAllWinnerAtLuckeyHit(data) {
+        let findAllParticipant = await this.luckyhitparticipantOrderRepository.find({ roomId: data?._id });
+        for await (const iterator of findAllParticipant) {
+            if (iterator?.color) {
+                if (data?.winColor.includes(iterator?.color)) {
+                    switch (iterator?.color) {
+                        case COLORLUCKYHIT.RED: {
+                       
+                                let data = {
+                                    amount: (iterator?.bitAmount * 2).toFixed(2)
+
+                                }
+                                await this.walletService.addAmountInWallet(data, iterator?.userId)
+                      
+                            break;
+                        }
+                        case COLORLUCKYHIT.BLACK: {
+                          
+                                let data = {
+                                    amount: (iterator?.bitAmount * 2).toFixed(2)
+
+                                }
+                                await this.walletService.addAmountInWallet(data, iterator?.userId)
+                        
+                            break;
+                        }
+                   
+                    }
+                }
+            }
+
+            this.events.emit('user.lucky.hit', data)
+
         }
     }
 }

@@ -31,4 +31,17 @@ export class RoomController {
       async getActiveRooms(){
         return await this.RoomService.getActiveRooms()
       }
+      @Get('getActiveluckyHitRooms')
+      async getActiveluckyHitRooms(){
+        return await this.RoomService.getActiveluckyHitRooms()
+      }
+      @Get('createDeck')
+      async createDeck(){
+        return await this.RoomService.createDeck()
+      }
+      @Post('logicCheck')
+      async logicCheck(@Body() data){
+        const {Black,Red}=data;
+        return await this.RoomService.logicCheck(Black,Red)
+      }
 }

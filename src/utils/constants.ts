@@ -45,14 +45,18 @@ export enum COLOR {
   GREEN = 'Green',
   VIOLET = 'Violet'
 }
+export enum COLORLUCKYHIT {
+  RED = 'Red',
+  BLACK = "Black"
+}
 export enum TNXType {
-DEBIT='Debit',
-CREDIT='Credit'
+  DEBIT = 'Debit',
+  CREDIT = 'Credit'
 }
 export enum TNXStatus {
-SUCCESS='Success',
-FAILED='Failed',
-PENDING='Pending'
+  SUCCESS = 'Success',
+  FAILED = 'Failed',
+  PENDING = 'Pending'
 }
 export enum PaymentMode {
   CARD = 'Card',
