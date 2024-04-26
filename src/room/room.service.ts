@@ -542,22 +542,15 @@ export class RoomService {
             }
         }
         const currentTime = new Date();
-        const thirtySecondsAgo = new Date(new Date(luckyHitroom?.endTime).getTime() - 15 * 1000);
+        const thireeSecondsAgo = new Date(new Date(luckyHitroom?.endTime).getTime() + 3 * 1000);
+        // console.log(currentTime,"currentdate")
         // console.log(`${currentTime.getHours()}:${currentTime.getMinutes()}:${currentTime.getSeconds()}`, `${thirtySecondsAgo.getHours()}:${thirtySecondsAgo.getMinutes()}:${thirtySecondsAgo.getSeconds()}`, "new " + `${thirtySecondsAgo.getSeconds() + 1}`)
-        if (currentTime.getHours() == thirtySecondsAgo.getHours() && currentTime.getMinutes() == thirtySecondsAgo.getMinutes() && (currentTime.getSeconds() == thirtySecondsAgo.getSeconds() || currentTime.getSeconds() == thirtySecondsAgo.getSeconds() + 1)) {
-            let data = {
-                luckyHitroomId: luckyHitroom?._id,
-                status: roomStatus.PENDING
-            }
-            await this.changeStatusluckyHit(data)
-        }
-        if (currentTime > new Date(luckyHitroom?.endTime)) {
-            let data = {
-                roomId: luckyHitroom?._id,
-                status: roomStatus.PENDING,
-                isContinue: false
-            }
-            await this.changeStatusluckyHit(data)
+        if (currentTime > new Date(luckyHitroom?.endTime) && luckyHitroom?.status ===roomStatus?.CONTINUE) {
+            // let data = {
+            //     luckyHitroomId: luckyHitroom?._id,
+            //     status: roomStatus.PENDING
+            // }
+            // console.log(currentTime,"Pending")
             let winner = await this.generateCards()
             console.log(winner, "winner")
 
@@ -567,6 +560,17 @@ export class RoomService {
 
             }
             await this.submitResultForLuckyHit(dataSubmit)
+            // await this.changeStatusluckyHit(data)
+        }
+        if (currentTime>thireeSecondsAgo && luckyHitroom?.status ===roomStatus?.PENDING) {
+            let data = {
+                roomId: luckyHitroom?._id,
+                status: roomStatus.COMPLEDTED,
+                isContinue: false
+            }
+            // console.log(currentTime,thireeSecondsAgo,"COMPLEDTED")
+            await this.changeStatusluckyHit(data)
+     
         }
 
     }
@@ -842,8 +846,8 @@ export class RoomService {
             Black:data?.winColor?.Black,
             Red:data?.winColor?.Red,
             Reason:data?.winColor?.Reason,
-            isContinue: false,
-            status: roomStatus.COMPLEDTED
+            isContinue: true,
+            status: roomStatus.PENDING
         }
         let updateroom = await this.luckyHitRoomRepository.findByIdAndUpdate(data?.roomId, { $set: object }, { new: true })
 
