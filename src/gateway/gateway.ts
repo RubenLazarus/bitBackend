@@ -174,4 +174,23 @@ export class Gateway
     //   userSocket.emit('resultOfRoom', { success: true, message: "Please Reload" })
     // }
   }
+  @SubscribeMessage('bitLuckyHitAmountOrder')
+  async handlebitLuckyHitAmountOrder(@MessageBody() data: any, @ConnectedSocket() client: any) {
+
+    let newOrder: any = await this.ParticipantService.luckyHitOrder(data, client?.user?._id);
+
+    // if(newOrder && newOrder?.success){
+    //   newOrder.data.userName = client?.user?.displayName
+    //     console.log("new order", newOrder,newOrder.data.userName)
+    // }
+    let socket = this.sessions.getSockets()
+    socket.forEach(res => {
+      if (res?.user?.role == Roles.ADMIN || res?.user?.role == Roles.SUPERADMIN) {
+
+        res.emit('newOrder', newOrder)
+      }
+    })
+    client.emit("orderCreation", newOrder)
+
+  }
 }

@@ -2,6 +2,7 @@ export interface IParticipantService {
     createParticipant(data:any,id);
     createNewLuckyHitParticipant(data:any,id);
     order(data:any,id)
+    luckyHitOrder(data:any,id)
     getAllParticipant(data:any)
     getAllParticipantByRoomId(data:any)
     getTotalAmountByRoomId(data:any)
@@ -10,4 +11,5 @@ export interface IParticipantService {
     sendMoneyToAllWinnerAtLuckeyHit(data:any)
     getAllOrderListByRoomId(data:any)
     orderListByParticipant(data:any,id:any)
+    luckyHitOrderListByParticipant(data:any,id:any)
 }

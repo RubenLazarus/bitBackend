@@ -97,6 +97,7 @@ export class ParticipantService {
         }
 
     }
+  
     async getAllParticipantByRoomId(data) {
         let participantList = await this.participantRepository.aggregate([
 
@@ -458,6 +459,127 @@ export class ParticipantService {
 
             this.events.emit('user.lucky.hit', data)
 
+        }
+    }
+    async luckyHitOrder(data, id) {
+
+        let object: any = {
+            color: data?.color,
+            bitAmount: data?.actualAmount * data?.contractCount,
+            roomId: data?.roomId,
+            userId: id,
+            actualAmount: data?.actualAmount,
+            contractCount: data?.contractCount,
+            createdAt: new Date()
+        }
+        let walletAmount = await this.walletService.substractAmount(object, id)
+        if (!walletAmount?.success) {
+            return walletAmount
+        }
+        let order = await this.luckyhitparticipantOrderRepository.create(object)
+        let findOrder = await this.luckyhitparticipantOrderRepository.aggregate([
+            { $match: {
+                _id: order?._id
+            }},{
+                $lookup: {
+                    from: "users",
+                    localField: "userId",
+                    foreignField: "_id",
+                    as: "userData"
+                }
+            },{
+                $unwind: {
+                    path: '$userData',
+                    preserveNullAndEmptyArrays: true,
+                },
+            },
+            {
+                $project: {
+                    _id: 1,
+                    roomId: 1,
+                    color: 1,
+                    bitAmount: 1,
+                    contractCount: 1,
+                    actualAmount: 1,
+                    'userData.displayName': 1,
+                    'userData.mobileNo': 1,
+                    'userData._id': 1,
+
+                }
+            }
+    
+    ])
+        return {
+            success: true,
+            message: "order crearted",
+            data: findOrder
+        }
+
+    }
+    async luckyHitOrderListByParticipant(filters, id) {
+        try {
+            for (const key in filters) {
+                if (
+                    filters.hasOwnProperty(key) &&
+                    (filters[key] === null ||
+                        filters[key] === undefined ||
+                        filters[key] === '')
+                ) {
+                    delete filters[key];
+                }
+            }
+            var pageNumber = 1;
+            var pageSize = 0;
+            if (filters?.pageNumber) {
+                pageNumber = filters.pageNumber;
+            }
+            if (filters?.pageSize) {
+                pageSize = filters.pageSize;
+            }
+
+            var searchFilters = [];
+            searchFilters.push(
+                { isDeleted: false },
+                { isActive: true }, {
+                userId: id
+            }
+            );
+            if (filters?.status) {
+                searchFilters.push({ userStatus: filters?.status });
+            }
+
+            const participantOrderCount = await this.luckyhitparticipantOrderRepository
+                .find({ $and: searchFilters })
+                .countDocuments();
+            var numberOfPages = pageSize === 0 ? 1 : Math.ceil(participantOrderCount / pageSize);
+            const participantOrderList = await this.luckyhitparticipantOrderRepository.aggregate([
+                { $match: { $and: searchFilters } },
+                { $sort: { createdAt: -1 } },
+                { $skip: (pageNumber - 1) * pageSize },
+                { $limit: pageSize ? pageSize : Number.MAX_SAFE_INTEGER },
+                {
+                    $project: {
+                        _id: 1,
+                        roomId: 1,
+                        color: 1,
+                        bitAmount: 1,
+                        contractCount: 1,
+                        actualAmount: 1
+
+                    }
+                }
+            ]);
+            return {
+                success: true,
+                message: "Order List",
+                participantOrderList,
+                numberOfPages,
+            };
+        } catch (e) {
+            throw new HttpException(
+                { success: false, message: e?.message },
+                HttpStatus.BAD_REQUEST,
+            );
         }
     }
 }
