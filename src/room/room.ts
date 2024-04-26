@@ -2,6 +2,7 @@ export interface IRoomService {
 createRoom(data:any);
 changeStatus(data:any);
 getAllRooms(data:any);
+getAllLuckyHitRooms(data:any);
 submitResult(data:any);
 getActiveRooms();
 getActiveluckyHitRooms();

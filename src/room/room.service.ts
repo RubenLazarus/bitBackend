@@ -552,7 +552,7 @@ export class RoomService {
             // }
             // console.log(currentTime,"Pending")
             let winner = await this.generateCards()
-            console.log(winner, "winner")
+            // console.log(winner, "winner")
 
             let dataSubmit = {
                 roomId: luckyHitroom?._id,
@@ -857,6 +857,81 @@ export class RoomService {
             success: true,
             message: "Result",
             data: updateroom
+        }
+    }
+    async getAllLuckyHitRooms(filters) {
+        try {
+            for (const key in filters) {
+                if (
+                    filters.hasOwnProperty(key) &&
+                    (filters[key] === null ||
+                        filters[key] === undefined ||
+                        filters[key] === '')
+                ) {
+                    delete filters[key];
+                }
+            }
+            if (!filters?.gameId) {
+                return {
+                    success: false,
+                    message: "Plese send Game Id"
+
+                }
+            }
+            var pageNumber = 1;
+            var pageSize = 0;
+            if (filters?.pageNumber) {
+                pageNumber = filters.pageNumber;
+            }
+            if (filters?.pageSize) {
+                pageSize = filters.pageSize;
+            }
+
+            var searchFilters = [];
+            searchFilters.push(
+                { isDeleted: false },
+                { isActive: true },
+                { gameId: filters?.gameId }
+            );
+            if (filters?.status) {
+                searchFilters.push({ userStatus: filters?.status });
+            }
+
+            const roomsCount = await this.luckyHitRoomRepository
+                .find({ $and: searchFilters })
+                .countDocuments();
+            var numberOfPages = pageSize === 0 ? 1 : Math.ceil(roomsCount / pageSize);
+            const roomsList = await this.luckyHitRoomRepository.aggregate([
+                { $match: { $and: searchFilters } },
+                { $sort: { createdAt: -1 } },
+                { $skip: (pageNumber - 1) * pageSize },
+                { $limit: pageSize ? pageSize : Number.MAX_SAFE_INTEGER },
+                {
+                    $project: {
+                        _id: 1,
+                        status: 1,
+                        startTime: 1,
+                        endTime: 1,
+                        totalAmount: 1,
+                        winColor: 1,
+                        Black: 1,
+                        Red: 1,
+                        Reason: 1,
+
+                    }
+                }
+            ]);
+            return {
+                success: true,
+                message: "Order List",
+                roomsList,
+                numberOfPages,
+            };
+        } catch (e) {
+            throw new HttpException(
+                { success: false, message: e?.message },
+                HttpStatus.BAD_REQUEST,
+            );
         }
     }
 }

@@ -23,6 +23,10 @@ export class RoomController {
       async getAllRooms(@Body() data:any){
         return await this.RoomService.getAllRooms(data)
       }
+      @Post('getAllLuckyHitRooms')
+      async getAllLuckyHitRooms(@Body() data:any){
+        return await this.RoomService.getAllLuckyHitRooms(data)
+      }
       @Post('submitResult')
       async submitResult(@Body() data:any){
         return await this.RoomService.submitResult(data)
