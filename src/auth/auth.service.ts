@@ -30,9 +30,9 @@ export class AuthService {
       displayName: data?.displayName
         ? data?.displayName
         : `${data?.firstName} ${data?.lastName}`,
-        role:data?.role
+      role: data?.role
     };
-    console.log(payload,"payload")
+    console.log(payload, "payload")
     const userInfo = data;
     delete userInfo._doc?.salt;
     delete userInfo._doc?.passwordHash;
@@ -53,13 +53,13 @@ export class AuthService {
       if (validateUser > 0) {
         return { message: 'User Already exist', success: false };
       }
-      if(User?.refrenceCode){
+      if (User?.refrenceCode) {
         const validRefCode: any = await this.userService.getUserCountByRefCode(User?.refrenceCode)
         if (validRefCode == 0) {
           return { message: 'RefrenceCode Does not Exist', success: false };
         }
       }
-    
+
 
       User.mobileNo = User?.mobileNo?.toLowerCase();
       const passwordHash = bcrypt.hashSync(
@@ -74,7 +74,7 @@ export class AuthService {
         firstName: User?.firstName,
         lastName: User?.lastName,
         passwordHash,
-        refrenceCode: User?.refrenceCode?User?.refrenceCode:null,
+        refrenceCode: User?.refrenceCode ? User?.refrenceCode : null,
         creatdAt: new Date(),
       };
 
@@ -85,7 +85,7 @@ export class AuthService {
         mobileNo: User.mobileNo
       }
 
-const addWallet = await this.walletService.createWellet(addNewuser?._id)
+      const addWallet = await this.walletService.createWellet(addNewuser?._id)
       const isSMSSend = await this.smsService.sentSMS(addNewuser, newOTP)
       if (isSMSSend) {
         await this.otpService.createOTP(OTPBody)
@@ -165,23 +165,83 @@ const addWallet = await this.walletService.createWellet(addNewuser?._id)
       console.log(error)
     }
   }
-  async VerifyOTP(data: any){
+  async VerifyOTP(data: any) {
 
-     const optData = await this.otpService.otpVerfications(data)
-     if(optData?.success){
+    const optData = await this.otpService.otpVerfications(data)
+    if (optData?.success) {
       const userInfo = await this.userService.verifyUser(data?.mobileNo)
-      if(userInfo){
+      if (userInfo) {
         const loginDetails = await this.createAccessToken(userInfo);
         return Object.assign(loginDetails, {
           success: true,
           message: 'User has been verified',
         });
       }
-     }
-     return {
+    }
+    return {
       success: false,
       massage: 'unable to verify otp',
     };
   }
-  
+  async OTPverification(data: any) {
+
+    const optData = await this.otpService.OTPLessVerify(data)
+    if (optData?.success) {
+      const newHash = await this.generateNewPassword(data?.password)
+      let object = {
+        mobileNo: data?.mobileNo,
+        passwordHash: newHash?.passwordHash
+      }
+      const userInfo = await this.userService.updatePassword(object)
+      if (userInfo) {
+        const loginDetails = await this.createAccessToken(userInfo);
+        return Object.assign(loginDetails, {
+          success: true,
+          message: 'User has been verified',
+        });
+      }
+    }
+    return {
+      success: false,
+      massage: 'unable to verify otp',
+    };
+  }
+  async forgotPassword(mobileNo: string) {
+    try {
+      mobileNo = mobileNo.toLowerCase();
+      const findUser = await this.userService.getUserByMobileNO(mobileNo)
+      if (
+        !findUser ||
+        findUser?.isActive === false ||
+        findUser?.isDeleted === true
+      ) {
+        return { success: false, message: 'Mobile no does not exist' };
+      }
+
+      let OTPBody = {
+        mobileNo: findUser?.mobileNo
+      }
+
+      await this.otpService.sendOTP(OTPBody)
+
+
+      return {
+        success: true,
+        message: 'Password reset OTP sent to your Mobile No.',
+      };
+    } catch (e) {
+      throw new HttpException(
+        { success: false, message: e?.message },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+  async generateNewPassword(password) {
+    const passwordHash = await bcrypt.hashSync(
+      password,
+      bcrypt.genSaltSync(10),
+    );
+    return { passwordHash }
+  }
+
 }

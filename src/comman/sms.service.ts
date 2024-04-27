@@ -47,4 +47,40 @@ export class smsService {
             );
         }
     }
+    async forgotPasswordSMS(data, otp) {
+        try {
+            const body = JSON.stringify({
+                "messages": [
+                    {
+                        "destinations": [{ "to": `91${data?.mobileNo}` }],
+                        "from": "ServiceSMS",
+                        "text": `Hello ${data?.displayName},\n\nThis is Your OTP\n ${otp} \n Have a nice day!`
+                    }
+                ]
+
+            })
+            const userData: any = await firstValueFrom(
+                this.httpservice.post(
+                    `${this.baseURL}/sms/2/text/advanced`,
+                    body,
+                    { headers: this.headersRequest }
+                ),
+            );
+            console.log(userData?.data?.messages)
+            if (userData?.data && userData?.data?.messages && userData?.data?.messages.length > 0) {
+
+                return true
+
+            }
+            else { return false }
+        } catch (e) {
+            throw new HttpException(
+                { success: false, message: e?.message },
+                HttpStatus.BAD_REQUEST,
+            );
+        }
+    }
+    async sendOTP(){
+        
+    }
 }

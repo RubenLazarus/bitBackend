@@ -22,4 +22,14 @@ export class AuthController {
     return await this.authService.VerifyOTP(loggedInUser)
 
   }
+  @Post('forgotPassword')
+  async forgotPassword(@Body() data:any){
+    return await this.authService.forgotPassword(data?.mobileNo)
+
+  }
+  @Post('OTPverification')
+  async OTPverification(@Body() data:any){
+    return await this.authService.OTPverification(data)
+
+  }
 }

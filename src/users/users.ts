@@ -8,4 +8,5 @@ getUserCount(email:string)
 getAllUser(userData:FilterDTO)
 getUserByMobileNO(email)
 verifyUser(mobileNo)
+updatePassword(data)
 }

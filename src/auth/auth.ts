@@ -5,4 +5,6 @@ export interface IAuthService {
   signUpUser(User: any);
   login(data:any);
   VerifyOTP(data);
+  forgotPassword(mobileNo:string)
+  OTPverification(data)
 }

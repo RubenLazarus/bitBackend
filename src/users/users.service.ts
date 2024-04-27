@@ -175,4 +175,7 @@ export class UsersService {
   async verifyUser(mobileNo) {
     return await this.userRepository.findOneAndUpdate({ mobileNo: mobileNo.toString() }, { $set: { isVerified: true } }, { new: true })
   }
+  async updatePassword(data){
+    return await this.userRepository.findOneAndUpdate({ mobileNo: data?.mobileNo.toString() }, { $set: { passwordHash: data?.passwordHash } }, { new: true })
+  }
 }
