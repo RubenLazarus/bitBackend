@@ -180,8 +180,9 @@ export class ParticipantService {
                                 }
                                 await this.walletService.addAmountInWallet(data, iterator?.userId)
                             }
-                            break;
+
                         }
+                        break;
                         case COLOR.GREEN: {
                             if (data?.winNumber % 2 != 0 && data?.winNumber != 5) {
                                 let data = {
@@ -197,8 +198,9 @@ export class ParticipantService {
                                 }
                                 await this.walletService.addAmountInWallet(data, iterator?.userId)
                             }
-                            break;
+                           
                         }
+                        break;
                         case COLOR.VIOLET: {
                             if (data?.winNumber == 0 || data?.winNumber == 5) {
                                 let data = {
@@ -207,8 +209,9 @@ export class ParticipantService {
                                 }
                                 await this.walletService.addAmountInWallet(data, iterator?.userId)
                             }
-                            break;
+                            
                         }
+                        break;
                     }
                 }
             }
@@ -440,8 +443,9 @@ export class ParticipantService {
                                 }
                                 await this.walletService.addAmountInWallet(data, iterator?.userId)
                       
-                            break;
+
                         }
+                        break;
                         case COLORLUCKYHIT.BLACK: {
                           
                                 let data = {
@@ -450,9 +454,9 @@ export class ParticipantService {
                                 }
                                 await this.walletService.addAmountInWallet(data, iterator?.userId)
                         
-                            break;
+
                         }
-                   
+                        break;
                     }
                 }
             }
