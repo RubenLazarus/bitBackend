@@ -80,7 +80,7 @@ export class OtpService {
             "phoneNumber": `91${data?.mobileNo}`,
             "channel": "SMS",
             "otpLength": 6,
-            "expiry": 60
+            "expiry": 360
           }
        
         let otp:any= await firstValueFrom(
@@ -103,7 +103,8 @@ export class OtpService {
                 otp:otp.data?.orderId,
                 creatdAt: new Date(),  
             }
-            await this.otp.create(otpBody);
+            const otp1 = await this.otp.create(otpBody);
+            console.log(otp1)
         }
        
   
@@ -137,7 +138,7 @@ export class OtpService {
         if(verifiedOTP?.data?.isOTPVerified){
             await this.otp.deleteMany({ mobileNo: body?.mobileNo });
         }
-        if(!verifiedOTP.data?.success){
+        if(!verifiedOTP.data?.isOTPVerified){
             return {
                 success :false,
                 message:"Unable to Verify OTP Please Try again letar"

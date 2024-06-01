@@ -543,7 +543,7 @@ export class RoomService {
         }
         const currentTime = new Date();
         const thireeSecondsAgo = new Date(new Date(luckyHitroom?.endTime).getTime() + 3 * 1000);
-        // console.log(currentTime,"currentdate")
+        // console.log(currentTime,"currentdate",new Date(luckyHitroom?.endTime),luckyHitroom?.status)
         // console.log(`${currentTime.getHours()}:${currentTime.getMinutes()}:${currentTime.getSeconds()}`, `${thirtySecondsAgo.getHours()}:${thirtySecondsAgo.getMinutes()}:${thirtySecondsAgo.getSeconds()}`, "new " + `${thirtySecondsAgo.getSeconds() + 1}`)
         if (currentTime > new Date(luckyHitroom?.endTime) && luckyHitroom?.status ===roomStatus?.CONTINUE) {
             // let data = {
@@ -849,9 +849,10 @@ export class RoomService {
             isContinue: true,
             status: roomStatus.PENDING
         }
+        console.log(data?.roomId,data?.winColor?.winner)
         let updateroom = await this.luckyHitRoomRepository.findByIdAndUpdate(data?.roomId, { $set: object }, { new: true })
 
-        this.paticipantService.sendMoneyToAllWinnerAtLuckeyHit(updateroom)
+        const data1 = await this.paticipantService.sendMoneyToAllWinnerAtLuckeyHit(updateroom)
         this.events.emit('announced.result.lucky.hit', updateroom)
         return {
             success: true,

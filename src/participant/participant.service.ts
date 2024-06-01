@@ -433,7 +433,7 @@ export class ParticipantService {
         let findAllParticipant = await this.luckyhitparticipantOrderRepository.find({ roomId: data?._id });
         for await (const iterator of findAllParticipant) {
             if (iterator?.color) {
-                if (data?.winColor.includes(iterator?.color)) {
+
                     switch (iterator?.color) {
                         case COLORLUCKYHIT.RED: {
                        
@@ -458,7 +458,7 @@ export class ParticipantService {
                         }
                         break;
                     }
-                }
+
             }
 
             this.events.emit('user.lucky.hit', data)
