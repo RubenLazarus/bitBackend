@@ -457,6 +457,7 @@ let iterator={
         // ]
 
         for await (const iterator of findAllParticipant) {
+            console.log(iterator)
             if (iterator?.color && data?.winColor.includes(iterator?.color) ) {
 
                 switch (iterator?.color) {
