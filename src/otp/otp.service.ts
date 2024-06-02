@@ -79,7 +79,7 @@ export class OtpService {
         let body ={
             "phoneNumber": `91${data?.mobileNo}`,
             "channel": "SMS",
-            "otpLength": 6,
+            "otpLength": 4,
             "expiry": 360
           }
        
