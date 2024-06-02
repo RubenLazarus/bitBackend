@@ -430,40 +430,66 @@ export class ParticipantService {
         }
     }
     async sendMoneyToAllWinnerAtLuckeyHit(data) {
+        console.log(data)
+let iterator={
+    color:"Red",
+    bitAmount:20,
+    userId:"b40ea140-215a-4015-ac96-68234c464e8d"
+}
+
+
+
+
+
+
+
         let findAllParticipant = await this.luckyhitparticipantOrderRepository.find({ roomId: data?._id });
+        // let findAllParticipant = [
+        //     {
+        //         color:"Red",
+        //         bitAmount:20,
+        //         userId:"b40ea140-215a-4015-ac96-68234c464e8d"
+        //     },{
+        //         color:"Black",
+        //         bitAmount:20,
+        //         userId:"b40ea140-215a-4015-ac96-68234c464e8d"
+        //     }
+        // ]
+
         for await (const iterator of findAllParticipant) {
-            if (iterator?.color) {
+            if (iterator?.color && data?.winColor.includes(iterator?.color) ) {
 
-                    switch (iterator?.color) {
-                        case COLORLUCKYHIT.RED: {
-                       
-                                let data = {
-                                    amount: (iterator?.bitAmount * 2).toFixed(2)
-
-                                }
-                                await this.walletService.addAmountInWallet(data, iterator?.userId)
-                      
-
-                        }
-                        break;
-                        case COLORLUCKYHIT.BLACK: {
-                          
-                                let data = {
-                                    amount: (iterator?.bitAmount * 2).toFixed(2)
-
-                                }
-                                await this.walletService.addAmountInWallet(data, iterator?.userId)
-                        
-
-                        }
-                        break;
+                switch (iterator?.color) {
+                    case COLORLUCKYHIT.RED: {
+                   
+                            let data = {
+                                amount: (iterator?.bitAmount * 2).toFixed(2)
+    
+                            }
+                           const user =await this.walletService.addAmountInWallet(data, iterator?.userId)
+                            console.log(COLORLUCKYHIT.RED,user)
+    
                     }
-
-            }
+                    break;
+                    case COLORLUCKYHIT.BLACK: {
+                      
+                            let data = {
+                                amount: (iterator?.bitAmount * 2).toFixed(2)
+    
+                            }
+                            const user = await this.walletService.addAmountInWallet(data, iterator?.userId)
+                    
+                            console.log(COLORLUCKYHIT.BLACK,user)
+                    }
+                    break;
+                }
+    
+        }
 
             this.events.emit('user.lucky.hit', data)
 
         }
+        console.log(data?.winColor)
     }
     async luckyHitOrder(data, id) {
 
