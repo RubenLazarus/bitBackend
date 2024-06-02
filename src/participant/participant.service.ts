@@ -507,6 +507,8 @@ let iterator={
             return walletAmount
         }
         let order = await this.luckyhitparticipantOrderRepository.create(object)
+        console.log(order,"Participation order",object)
+
         let findOrder = await this.luckyhitparticipantOrderRepository.aggregate([
             { $match: {
                 _id: order?._id
