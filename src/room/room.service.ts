@@ -729,7 +729,7 @@ export class RoomService {
     async gameRules(black, Red) {
         let rankBlack = await this.getRank(black)
         let rankRed = await this.getRank(Red)
-        console.log(rankBlack, rankRed)
+        // console.log(rankBlack, rankRed)
         if (rankBlack?.rank < rankRed?.rank) {
 
 
@@ -760,7 +760,7 @@ export class RoomService {
 
         // Sort the hand by rank and suit
         hand.sort((a, b) => a.Rank - b.Rank);
-        console.log(hand)
+        // console.log(hand)
 
         // Check for Trio
         if (hand[0]['Value'] === hand[1]['Value'] && hand[1]['Value'] === hand[2]['Value']) {
@@ -849,7 +849,7 @@ export class RoomService {
             isContinue: true,
             status: roomStatus.PENDING
         }
-        console.log(data?.roomId,data?.winColor?.winner)
+        console.log(data?.roomId,"<+++==== Room Id",data?.winColor?.winner,"<===== winning color")
         let updateroom = await this.luckyHitRoomRepository.findByIdAndUpdate(data?.roomId, { $set: object }, { new: true })
 
         const data1 = await this.paticipantService.sendMoneyToAllWinnerAtLuckeyHit(updateroom)

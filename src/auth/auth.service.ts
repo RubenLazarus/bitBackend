@@ -32,7 +32,7 @@ export class AuthService {
         : `${data?.firstName} ${data?.lastName}`,
       role: data?.role
     };
-    console.log(payload, "payload")
+    // console.log(payload, "payload")
     const userInfo = data;
     delete userInfo._doc?.salt;
     delete userInfo._doc?.passwordHash;

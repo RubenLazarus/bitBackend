@@ -152,7 +152,7 @@ export class ParticipantService {
             $group: { _id: null, sum: { $sum: "$bitAmount" } }
         }
         ]);
-        console.log(totalAmount)
+        // console.log(totalAmount)
         return {
             success: true,
             message: "Total amount",
@@ -422,7 +422,7 @@ export class ParticipantService {
             $group: { _id: null, sum: { $sum: "$bitAmount" } }
         }
         ]);
-        console.log(totalAmount)
+        // console.log(totalAmount)
         return {
             success: true,
             message: "Total amount",
@@ -430,7 +430,7 @@ export class ParticipantService {
         }
     }
     async sendMoneyToAllWinnerAtLuckeyHit(data) {
-        console.log(data)
+        // console.log(data)
 let iterator={
     color:"Red",
     bitAmount:20,
@@ -455,9 +455,9 @@ let iterator={
         //         userId:"b40ea140-215a-4015-ac96-68234c464e8d"
         //     }
         // ]
-
+        console.log(findAllParticipant,"particepant fetch data")
         for await (const iterator of findAllParticipant) {
-            console.log(iterator)
+            
             if (iterator?.color && data?.winColor.includes(iterator?.color) ) {
 
                 switch (iterator?.color) {
@@ -490,7 +490,7 @@ let iterator={
             this.events.emit('user.lucky.hit', data)
 
         }
-        console.log(data?.winColor)
+        // console.log(data?.winColor)
     }
     async luckyHitOrder(data, id) {
 

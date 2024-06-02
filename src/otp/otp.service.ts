@@ -75,7 +75,7 @@ export class OtpService {
         const today = new Date();
         const resetPasswordExpires = new Date(today);
         resetPasswordExpires.setMinutes(today.getMinutes() + 15);
-        console.log(process.env.OTP_CLIENTID,process.env.OTP_CLIENTSECRET)
+        // console.log(process.env.OTP_CLIENTID,process.env.OTP_CLIENTSECRET)
         let body ={
             "phoneNumber": `91${data?.mobileNo}`,
             "channel": "SMS",
@@ -104,7 +104,7 @@ export class OtpService {
                 creatdAt: new Date(),  
             }
             const otp1 = await this.otp.create(otpBody);
-            console.log(otp1)
+            // console.log(otp1)
         }
        
   

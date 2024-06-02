@@ -81,7 +81,7 @@ export class Gateway
   @OnEvent('user.result')
   async resuletEvent(payload: any) {
     let userSocket = this.sessions.getUserSocket(payload?.userId)
-    console.log(payload)
+    // console.log(payload)
     if (userSocket) {
       userSocket.emit('resultOfRoom', { success: true, message: "Please Reload" })
     }
@@ -145,7 +145,7 @@ export class Gateway
   }
   @SubscribeMessage('CreateNewLuckyHitParticipant')
   async handleCreateNewLuckyHitParticipant(@MessageBody() data: any, @ConnectedSocket() client: any) {
-    console.log(data, client?.user)
+    console.log(data, client?.user,'CreateNewLuckyHitParticipant')
 
     let newParticipant = await this.ParticipantService.createNewLuckyHitParticipant(data, client?.user?._id);
 
@@ -156,7 +156,7 @@ export class Gateway
   @OnEvent('user.lucky.hit')
   async resuletLuckyHitEvent(payload: any) {
     let userSocket = this.sessions.getUserSocket(payload?.userId)
-    console.log(payload)
+    // console.log(payload)
     if (userSocket) {
       userSocket.emit('resultOfRoomLuckyHit', { success: true, message: "Please Reload" })
     }

@@ -66,7 +66,7 @@ export class smsService {
                     { headers: this.headersRequest }
                 ),
             );
-            console.log(userData?.data?.messages)
+            // console.log(userData?.data?.messages)
             if (userData?.data && userData?.data?.messages && userData?.data?.messages.length > 0) {
 
                 return true
